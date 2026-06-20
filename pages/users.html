@@ -1,158 +1,565 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manajemen User — PT Galaxy MultiTrans</title>
-<link rel="stylesheet" href="../css/style.css">
-<link rel="icon" type="image/png" href="../image/logo1.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Diplomata&family=Lobster&family=Oswald:wght@500&family=Pliant:ital,wght@0,100..900;1,100..900&family=Six+Caps&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-</head>
-<body>
-<div class="app-layout">
-  <aside class="sidebar">
-    <div class="sidebar-logo"><div class="logo-icon"><img src="../image/logo1.png" alt="Logo Galaxy MultiTrans"></div><div class="logo-text"><strong>Galaxy MultiTrans</strong><span>Ekspedisi & Logistik</span></div></div>
-    <nav class="sidebar-nav">
-      <div class="nav-section"><div class="nav-section-label">Utama</div><a href="dashboard.html" class="nav-item"><span class="nav-icon">◈</span> Dashboard</a></div>
-      <div class="nav-section"><div class="nav-section-label">Transaksi</div><a href="shipments.html" class="nav-item"><span class="nav-icon">📦</span> Pengiriman</a><a href="invoices.html" class="nav-item"><span class="nav-icon">🧾</span> Invoice</a></div>
-      <div class="nav-section"><div class="nav-section-label">Data Master</div>
-        <a href="customers.html" class="nav-item"><span class="nav-icon">👥</span> Pelanggan</a>
-        <a href="destinations.html" class="nav-item"><span class="nav-icon">📍</span> Tujuan</a>
-        <a href="services.html" class="nav-item"><span class="nav-icon">⚙️</span> Layanan & Tarif</a>
-      </div>
-      <div class="nav-section"><div class="nav-section-label">Laporan</div><a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Laporan</a></div>
-      <div class="nav-section"><div class="nav-section-label">Administrasi</div><a href="users.html" class="nav-item active"><span class="nav-icon">🔑</span> Manajemen User</a></div>
-    </nav>
-    <div class="sidebar-user"><div class="user-avatar" id="sidebarUserAvatar">A</div><div class="user-info"><strong id="sidebarUserName">User</strong><span id="sidebarUserRole">role</span></div><button class="btn-logout" onclick="API.logout()">⏻</button></div>
-  </aside>
-  <div class="main-content">
-    <div class="topbar">
-      <div class="topbar-title"><h2>Manajemen User</h2><p>Kelola akun pengguna sistem</p></div>
-      <div class="topbar-actions"><button class="btn btn-primary" onclick="openAdd()">+ User Baru</button></div>
-    </div>
-    <div class="page-content">
-      <div data-aos="fade-down"
-        data-aos-duration="3001">
-      <div class="alert alert-info mb-4">🔒 Halaman ini hanya dapat diakses oleh Admin. Kelola user dengan hati-hati.</div>
-    </div>
-    <div data-aos="fade-down"
-      data-aos-anchor-placement="center-center">
-      <div class="card">
-        <div class="card-header"><h3>Daftar User</h3></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Nama</th><th>Username</th><th>Email</th><th>Role</th><th>Dibuat</th><th>Aksi</th></tr></thead>
-            <tbody id="tableBody"><tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-secondary)">Memuat data...</td></tr></tbody>
-          </table>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Manajemen User — PT Galaxy MultiTrans</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="icon" type="image/png" href="../image/logo1.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <style>
+      /* ===== USER PAGE — MOBILE STYLES ===== */
+
+      .mobile-list {
+        margin-top: 0.25rem;
+        display: none;
+      }
+
+      .user-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+      }
+      .user-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-bottom: 0.6rem;
+      }
+      .user-card-identity {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        min-width: 0;
+      }
+      .user-card-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+      }
+      .user-card-name {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .user-card-rows {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.3rem 0.75rem;
+        font-size: 0.82rem;
+      }
+      .user-card-rows dt {
+        color: var(--text-secondary);
+        white-space: nowrap;
+      }
+      .user-card-rows dd {
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      @media (max-width: 640px) {
+        .table-wrap table {
+          display: none;
+        }
+        .mobile-list {
+          display: block;
+        }
+
+        /* Teks tombol sembunyikan, tampilkan ikon */
+        .btn-user-text {
+          display: none;
+        }
+        .btn-user-icon {
+          display: inline;
+        }
+
+        /* Modal sheet dari bawah */
+        .modal-overlay {
+          padding: 0;
+          align-items: flex-end;
+        }
+        .modal {
+          border-radius: 16px 16px 0 0 !important;
+          max-height: 92vh;
+        }
+      }
+
+      @media (min-width: 641px) {
+        .btn-user-icon {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <!-- ===== SIDEBAR ===== -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-icon">
+            <img src="../image/logo1.png" alt="Logo Galaxy MultiTrans" />
+          </div>
+          <div class="logo-text">
+            <strong>Galaxy MultiTrans</strong>
+            <span>Ekspedisi & Logistik</span>
+          </div>
+          <button
+            class="sidebar-close"
+            onclick="closeSidebar()"
+            aria-label="Tutup menu"
+          >
+            ✕
+          </button>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section">
+            <div class="nav-section-label">Utama</div>
+            <a href="dashboard.html" class="nav-item" onclick="closeSidebar()"
+              ><span class="nav-icon">◈</span> Dashboard</a
+            >
+          </div>
+          <div class="nav-section">
+            <div class="nav-section-label">Transaksi</div>
+            <a href="shipments.html" class="nav-item" onclick="closeSidebar()"
+              ><span class="nav-icon">📦</span> Pengiriman</a
+            >
+            <a href="invoices.html" class="nav-item" onclick="closeSidebar()"
+              ><span class="nav-icon">🧾</span> Invoice</a
+            >
+          </div>
+          <div class="nav-section">
+            <div class="nav-section-label">Data Master</div>
+            <a href="customers.html" class="nav-item" onclick="closeSidebar()"
+              ><span class="nav-icon">👥</span> Pelanggan</a
+            >
+            <a
+              href="destinations.html"
+              class="nav-item"
+              onclick="closeSidebar()"
+              ><span class="nav-icon">📍</span> Tujuan</a
+            >
+            <a href="services.html" class="nav-item" onclick="closeSidebar()"
+              ><span class="nav-icon">⚙️</span> Layanan & Tarif</a
+            >
+          </div>
+          <div class="nav-section">
+            <div class="nav-section-label">Laporan</div>
+            <a href="reports.html" class="nav-item" onclick="closeSidebar()"
+              ><span class="nav-icon">📊</span> Laporan</a
+            >
+          </div>
+          <div class="nav-section">
+            <div class="nav-section-label">Administrasi</div>
+            <a
+              href="users.html"
+              class="nav-item active"
+              onclick="closeSidebar()"
+              ><span class="nav-icon">🔑</span> Manajemen User</a
+            >
+          </div>
+        </nav>
+        <div class="sidebar-user">
+          <div class="user-avatar" id="sidebarUserAvatar">A</div>
+          <div class="user-info">
+            <strong id="sidebarUserName">User</strong>
+            <span id="sidebarUserRole">role</span>
+          </div>
+          <button class="btn-logout" onclick="API.logout()" aria-label="Logout">
+            ⏻
+          </button>
+        </div>
+      </aside>
+
+      <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+        onclick="closeSidebar()"
+      ></div>
+
+      <!-- ===== MAIN CONTENT ===== -->
+      <div class="main-content">
+        <div class="topbar">
+          <button
+            class="menu-toggle"
+            onclick="openSidebar()"
+            aria-label="Buka menu"
+          >
+            ☰
+          </button>
+          <div class="topbar-title">
+            <h2>Manajemen User</h2>
+            <p>Kelola akun pengguna sistem</p>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn btn-primary" onclick="openAdd()">
+              <span class="btn-user-text">+ User Baru</span>
+              <span class="btn-user-icon">+</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="page-content">
+          <div data-aos="fade-down">
+            <div class="alert alert-info mb-4">
+              🔒 Halaman ini hanya dapat diakses oleh Admin. Kelola user dengan
+              hati-hati.
+            </div>
+          </div>
+
+          <div data-aos="fade-down" data-aos-delay="100">
+            <div class="card">
+              <div class="card-header"><h3>Daftar User</h3></div>
+
+              <!-- Desktop table -->
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nama</th>
+                      <th>Username</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Dibuat</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tableBody">
+                    <tr>
+                      <td
+                        colspan="6"
+                        style="
+                          text-align: center;
+                          padding: 2rem;
+                          color: var(--text-secondary);
+                        "
+                      >
+                        Memuat data...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Mobile card list -->
+              <div class="mobile-list" id="mobileList">
+                <div
+                  style="
+                    text-align: center;
+                    padding: 2rem;
+                    color: var(--text-secondary);
+                  "
+                >
+                  Memuat data...
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="modal-overlay" id="modalForm">
-  <div class="modal modal-sm">
-    <div class="modal-header"><h3>Tambah User Baru</h3><button class="modal-close" onclick="closeModal('modalForm')">✕</button></div>
-    <div class="modal-body">
-      <div id="formAlert"></div>
-      <div class="form-group"><label class="form-label">Nama Lengkap <span>*</span></label><input class="form-control" id="fName" placeholder="Nama pengguna"></div>
-      <div class="form-group"><label class="form-label">Username <span>*</span></label><input class="form-control" id="fUsername" placeholder="Username login"></div>
-      <div class="form-group"><label class="form-label">Email</label><input class="form-control" id="fEmail" type="email" placeholder="email@domain.com"></div>
-      <div class="form-group"><label class="form-label">Password <span>*</span></label><input class="form-control" id="fPassword" type="password" placeholder="Minimal 6 karakter"></div>
-      <div class="form-group"><label class="form-label">Role <span>*</span></label>
-        <select class="form-control" id="fRole">
-          <option value="staff">Staff Operasional</option>
-          <option value="keuangan">Staff Keuangan</option>
-          <option value="admin">Admin</option>
-        </select>
-      </div>
-      <div style="background:var(--bg);border-radius:var(--radius-sm);padding:.75rem;font-size:.82rem;color:var(--text-secondary)">
-        <strong>Hak Akses:</strong><br>
-        • <strong>Staff</strong>: Input pengiriman, lihat data<br>
-        • <strong>Keuangan</strong>: Kelola invoice, laporan keuangan<br>
-        • <strong>Admin</strong>: Akses penuh semua fitur
+    <!-- ===== MODAL: Form User ===== -->
+    <div class="modal-overlay" id="modalForm">
+      <div class="modal modal-sm">
+        <div class="modal-header">
+          <h3>Tambah User Baru</h3>
+          <button class="modal-close" onclick="closeModal('modalForm')">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="formAlert"></div>
+          <div class="form-group">
+            <label class="form-label"
+              >Nama Lengkap <span style="color: var(--danger)">*</span></label
+            >
+            <input
+              class="form-control"
+              id="fName"
+              placeholder="Nama pengguna"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label"
+              >Username <span style="color: var(--danger)">*</span></label
+            >
+            <input
+              class="form-control"
+              id="fUsername"
+              placeholder="Username login"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input
+              class="form-control"
+              id="fEmail"
+              type="email"
+              placeholder="email@domain.com"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label"
+              >Password <span style="color: var(--danger)">*</span></label
+            >
+            <input
+              class="form-control"
+              id="fPassword"
+              type="password"
+              placeholder="Minimal 6 karakter"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label"
+              >Role <span style="color: var(--danger)">*</span></label
+            >
+            <select class="form-control" id="fRole">
+              <option value="staff">Staff Operasional</option>
+              <option value="keuangan">Staff Keuangan</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div
+            style="
+              background: var(--bg);
+              border-radius: var(--radius-sm);
+              padding: 0.75rem;
+              font-size: 0.82rem;
+              color: var(--text-secondary);
+            "
+          >
+            <strong>Hak Akses:</strong><br />
+            • <strong>Staff</strong>: Input pengiriman, lihat data<br />
+            • <strong>Keuangan</strong>: Kelola invoice, laporan keuangan<br />
+            • <strong>Admin</strong>: Akses penuh semua fitur
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('modalForm')">
+            Batal
+          </button>
+          <button class="btn btn-primary" onclick="saveData()" id="saveBtn">
+            Buat User
+          </button>
+        </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modalForm')">Batal</button>
-      <button class="btn btn-primary" onclick="saveData()" id="saveBtn">Buat User</button>
-    </div>
-  </div>
-</div>
 
-<script src="../js/api.js"></script>
-<script>
-requireAuth();
-const user = API.getUser();
-if (user?.role !== 'admin') { showToast('Akses ditolak', 'error'); setTimeout(() => window.location.href = 'dashboard.html', 1500); }
-initUserInfo();
+    <script src="../js/api.js"></script>
+    <script>
+      /* ===== SIDEBAR ===== */
+      function openSidebar() {
+        document.getElementById("sidebar").classList.add("open");
+        document.getElementById("sidebarOverlay").classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+      function closeSidebar() {
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("sidebarOverlay").classList.remove("open");
+        document.body.style.overflow = "";
+      }
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 768) closeSidebar();
+      });
 
-let allData = [];
+      /* ===== INIT ===== */
+      requireAuth();
+      const user = API.getUser();
+      if (user?.role !== "admin") {
+        showToast("Akses ditolak", "error");
+        setTimeout(() => (window.location.href = "dashboard.html"), 1500);
+      }
+      initUserInfo();
 
-async function loadAll() {
-  try { allData = await API.getUsers(); renderTable(allData); }
-  catch(e) { showToast(e.message, 'error'); }
-}
+      let allData = [];
+      const roleColors = {
+        admin: "#553C9A",
+        staff: "#2C5282",
+        keuangan: "#744210",
+      };
 
-const roleColors = { admin: '#553C9A', staff: '#2C5282', keuangan: '#744210' };
+      /* ===== LOAD ===== */
+      async function loadAll() {
+        try {
+          allData = await API.getUsers();
+          renderTable(allData);
+          renderMobileList(allData);
+        } catch (e) {
+          showToast(e.message, "error");
+        }
+      }
 
-function renderTable(data) {
-  const tbody = document.getElementById('tableBody');
-  const currentUser = API.getUser();
-  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-secondary" style="padding:2rem">Tidak ada user</td></tr>'; return; }
-  tbody.innerHTML = data.map(u => `<tr>
-    <td>
-      <div style="display:flex;align-items:center;gap:.6rem">
-        <div style="width:32px;height:32px;background:${roleColors[u.role]||'var(--primary)'};border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;flex-shrink:0">${u.name.charAt(0)}</div>
-        <strong>${u.name}</strong>
+      /* ===== RENDER TABLE (Desktop) ===== */
+      function renderTable(data) {
+        const tbody = document.getElementById("tableBody");
+        const currentUser = API.getUser();
+        if (!data.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-secondary)">Tidak ada user</td></tr>';
+          return;
+        }
+        tbody.innerHTML = data
+          .map(
+            (u) => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:.6rem">
+          <div style="width:32px;height:32px;background:${roleColors[u.role] || "var(--primary)"};border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;flex-shrink:0">${u.name.charAt(0)}</div>
+          <strong>${u.name}</strong>
+        </div>
+      </td>
+      <td><code style="background:var(--bg);padding:.2rem .5rem;border-radius:4px;font-size:.85rem">${u.username}</code></td>
+      <td>${u.email || "—"}</td>
+      <td><span class="badge badge-${u.role}">${u.role}</span></td>
+      <td>${formatDate(u.created_at)}</td>
+      <td>
+        ${
+          u.id === currentUser?.id
+            ? '<span style="color:var(--text-secondary);font-size:.8rem">Akun Saat Ini</span>'
+            : `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}','${u.name}')">Hapus</button>`
+        }
+      </td>
+    </tr>`,
+          )
+          .join("");
+      }
+
+      /* ===== RENDER CARD LIST (Mobile) ===== */
+      function renderMobileList(data) {
+        const el = document.getElementById("mobileList");
+        const currentUser = API.getUser();
+        if (!data.length) {
+          el.innerHTML =
+            '<div style="text-align:center;padding:2rem;color:var(--text-secondary)">Tidak ada user</div>';
+          return;
+        }
+        el.innerHTML = data
+          .map(
+            (u) => `
+    <div class="user-card">
+      <div class="user-card-top">
+        <div class="user-card-identity">
+          <div class="user-card-avatar" style="background:${roleColors[u.role] || "var(--primary)"}">
+            ${u.name.charAt(0)}
+          </div>
+          <span class="user-card-name">${u.name}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:.5rem;flex-shrink:0">
+          <span class="badge badge-${u.role}">${u.role}</span>
+          ${
+            u.id === currentUser?.id
+              ? ""
+              : `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}','${u.name}')">🗑</button>`
+          }
+        </div>
       </div>
-    </td>
-    <td><code style="background:var(--bg);padding:.2rem .5rem;border-radius:4px;font-size:.85rem">${u.username}</code></td>
-    <td>${u.email||'—'}</td>
-    <td><span class="badge badge-${u.role}">${u.role}</span></td>
-    <td>${formatDate(u.created_at)}</td>
-    <td>${u.id === currentUser?.id ? '<span style="color:var(--text-secondary);font-size:.8rem">Akun Saat Ini</span>' : `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}','${u.name}')">Hapus</button>`}</td>
-  </tr>`).join('');
-}
+      <dl class="user-card-rows">
+        <dt>👤</dt><dd><code style="background:var(--bg);padding:.1rem .4rem;border-radius:4px;font-size:.8rem">${u.username}</code></dd>
+        <dt>📧</dt><dd>${u.email || "—"}</dd>
+        <dt>📅</dt><dd>${formatDate(u.created_at)}</dd>
+        ${u.id === currentUser?.id ? `<dt></dt><dd style="color:var(--text-secondary);font-size:.78rem">Akun Saat Ini</dd>` : ""}
+      </dl>
+    </div>`,
+          )
+          .join("");
+      }
 
-function openAdd() {
-  ['fName','fUsername','fEmail','fPassword'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('fRole').value = 'staff';
-  document.getElementById('formAlert').innerHTML = '';
-  openModal('modalForm');
-}
+      /* ===== OPEN ADD ===== */
+      function openAdd() {
+        ["fName", "fUsername", "fEmail", "fPassword"].forEach(
+          (id) => (document.getElementById(id).value = ""),
+        );
+        document.getElementById("fRole").value = "staff";
+        document.getElementById("formAlert").innerHTML = "";
+        openModal("modalForm");
+      }
 
-async function saveData() {
-  const btn = document.getElementById('saveBtn'); btn.disabled = true;
-  try {
-    const data = { name: document.getElementById('fName').value.trim(), username: document.getElementById('fUsername').value.trim(), email: document.getElementById('fEmail').value.trim(), password: document.getElementById('fPassword').value, role: document.getElementById('fRole').value };
-    if (!data.name || !data.username || !data.password) { document.getElementById('formAlert').innerHTML = '<div class="alert alert-error">Lengkapi semua field wajib</div>'; return; }
-    if (data.password.length < 6) { document.getElementById('formAlert').innerHTML = '<div class="alert alert-error">Password minimal 6 karakter</div>'; return; }
-    await API.createUser(data);
-    closeModal('modalForm'); showToast('User berhasil dibuat!'); loadAll();
-  } catch(e) { document.getElementById('formAlert').innerHTML = `<div class="alert alert-error">${e.message}</div>`; }
-  finally { btn.disabled = false; }
-}
+      /* ===== SAVE ===== */
+      async function saveData() {
+        const btn = document.getElementById("saveBtn");
+        btn.disabled = true;
+        try {
+          const data = {
+            name: document.getElementById("fName").value.trim(),
+            username: document.getElementById("fUsername").value.trim(),
+            email: document.getElementById("fEmail").value.trim(),
+            password: document.getElementById("fPassword").value,
+            role: document.getElementById("fRole").value,
+          };
+          if (!data.name || !data.username || !data.password) {
+            document.getElementById("formAlert").innerHTML =
+              '<div class="alert alert-error">Lengkapi semua field wajib</div>';
+            return;
+          }
+          if (data.password.length < 6) {
+            document.getElementById("formAlert").innerHTML =
+              '<div class="alert alert-error">Password minimal 6 karakter</div>';
+            return;
+          }
+          await API.createUser(data);
+          closeModal("modalForm");
+          showToast("User berhasil dibuat!");
+          loadAll();
+        } catch (e) {
+          document.getElementById("formAlert").innerHTML =
+            `<div class="alert alert-error">${e.message}</div>`;
+        } finally {
+          btn.disabled = false;
+        }
+      }
 
-async function deleteUser(id, name) {
-  if (!confirmAction(`Yakin hapus user "${name}"? Tindakan ini tidak bisa dibatalkan.`)) return;
-  try { await API.deleteUser(id); showToast('User dihapus'); loadAll(); }
-  catch(e) { showToast(e.message, 'error'); }
-}
+      /* ===== DELETE ===== */
+      async function deleteUser(id, name) {
+        if (
+          !confirmAction(
+            `Yakin hapus user "${name}"? Tindakan ini tidak bisa dibatalkan.`,
+          )
+        )
+          return;
+        try {
+          await API.deleteUser(id);
+          showToast("User dihapus");
+          loadAll();
+        } catch (e) {
+          showToast(e.message, "error");
+        }
+      }
 
+      /* ===== AOS ===== */
+      AOS.init({
+        duration: 700,
+        easing: "ease-in-out",
+        once: true,
+        disable: window.innerWidth < 768,
+      });
 
-AOS.init({
-    duration: 700,
-    easing: 'ease-in-out',
-    once: true
-  });
-
-loadAll();
-</script>
-</body>
+      loadAll();
+    </script>
+  </body>
 </html>

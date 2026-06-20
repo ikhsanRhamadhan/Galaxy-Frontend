@@ -58,31 +58,31 @@ const API = {
 
 // ── Role Permission System ────────────────────────────────────────────────────
 const ROLES = {
-  admin:    { label: 'Admin',    color: '#553C9A', bg: '#E9D8FD' },
-  staff:    { label: 'Staff',    color: '#2C5282', bg: '#BEE3F8' },
+  admin: { label: 'Admin', color: '#553C9A', bg: '#E9D8FD' },
+  staff: { label: 'Staff', color: '#2C5282', bg: '#BEE3F8' },
   keuangan: { label: 'Keuangan', color: '#744210', bg: '#FEFCBF' },
 };
 
 const PERMISSIONS = {
   // Pengiriman
-  'shipment.create':  ['admin', 'staff'],
-  'shipment.update':  ['admin', 'staff'],
-  'shipment.delete':  ['admin'],
+  'shipment.create': ['admin', 'staff'],
+  'shipment.update': ['admin', 'staff'],
+  'shipment.delete': ['admin'],
   // Invoice
-  'invoice.view':     ['admin', 'keuangan'],
-  'invoice.create':   ['admin', 'keuangan'],
-  'invoice.update':   ['admin', 'keuangan'],
-  'invoice.delete':   ['admin'],
+  'invoice.view': ['admin', 'keuangan'],
+  'invoice.create': ['admin', 'keuangan'],
+  'invoice.update': ['admin', 'keuangan'],
+  'invoice.delete': ['admin'],
   // Data Master
-  'master.create':    ['admin'],
-  'master.update':    ['admin'],
-  'master.delete':    ['admin'],
+  'master.create': ['admin'],
+  'master.update': ['admin'],
+  'master.delete': ['admin'],
   // Laporan
-  'report.shipment':  ['admin', 'staff', 'keuangan'],
-  'report.finance':   ['admin', 'keuangan'],
-  'report.export':    ['admin', 'keuangan'],
+  'report.shipment': ['admin', 'staff', 'keuangan'],
+  'report.finance': ['admin', 'keuangan'],
+  'report.export': ['admin', 'keuangan'],
   // User management
-  'user.manage':      ['admin'],
+  'user.manage': ['admin'],
 };
 
 function can(permission) {
@@ -117,7 +117,7 @@ function applyRoleUI() {
     document.querySelectorAll('[data-nav="report-finance"]').forEach(el => { if (el) el.style.display = 'none'; });
     document.querySelectorAll('[data-nav="users"]').forEach(el => { if (el) el.style.display = 'none'; });
   }
-  
+
   if (user.role === 'keuangan') {
     document.querySelectorAll('[data-nav="users"]').forEach(el => { if (el) el.style.display = 'none'; });
     document.querySelectorAll('[data-nav="report-shipments"]').forEach(el => { if (el) el.style.display = 'none'; });
@@ -133,19 +133,19 @@ function applyRoleUI() {
     'data-perm-shipment-create': 'shipment.create',
     'data-perm-shipment-update': 'shipment.update',
     'data-perm-shipment-delete': 'shipment.delete',
-    'data-perm-invoice-view':    'invoice.view',
-    'data-perm-invoice-create':  'invoice.create',
-    'data-perm-invoice-delete':  'invoice.delete',
-    'data-perm-master-write':    'master.manage',
-    'data-perm-report-finance':  'report.finance',
-    'data-perm-user-manage':     'user.manage',
+    'data-perm-invoice-view': 'invoice.view',
+    'data-perm-invoice-create': 'invoice.create',
+    'data-perm-invoice-delete': 'invoice.delete',
+    'data-perm-master-write': 'master.manage',
+    'data-perm-report-finance': 'report.finance',
+    'data-perm-user-manage': 'user.manage',
   };
 
   Object.entries(permMap).forEach(([attr, perm]) => {
     document.querySelectorAll(`[${attr}]`).forEach(el => {
       if (attr === 'data-perm-master-write' && isRestrictedMaster) {
         el.style.display = 'none';
-      } 
+      }
       else if (!can(perm)) {
         el.style.display = 'none';
       }
@@ -244,10 +244,10 @@ document.body.appendChild(progressBar);
 function startPageLoading() {
   const content = document.querySelector('.main-content') || document.body;
   if (content) content.classList.add('page-dimmed');
-  
+
   progressBar.style.opacity = '1';
   progressBar.style.width = '0%';
-  
+
   setTimeout(() => { progressBar.style.width = '30%'; }, 50);
   setTimeout(() => { progressBar.style.width = '70%'; }, 200);
 }
@@ -287,7 +287,7 @@ if (originalFetch) {
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebarOverlay');
-  
+
   sidebar?.classList.toggle('open');
   overlay?.classList.toggle('open');
 }

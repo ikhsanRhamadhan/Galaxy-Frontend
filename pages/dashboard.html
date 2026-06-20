@@ -1,255 +1,449 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard — PT Galaxy MultiTrans</title>
-<link rel="stylesheet" href="../css/style.css">
-<link rel="icon" type="image/png" href="../image/logo1.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Diplomata&family=Lobster&family=Oswald:wght@500&family=Pliant:ital,wght@0,100..900;1,100..900&family=Six+Caps&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-</head>
-<body>
-<div class="app-layout">
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon"><img src="../image/logo1.png" alt="Logo Galaxy MultiTrans"></div>
-      <div class="logo-text"><strong>Galaxy MultiTrans</strong><span>Ekspedisi & Logistik</span></div>
-      <button class="sidebar-close" onclick="closeSidebar()">✕</button>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">
-        <div class="nav-section-label">Utama</div>
-        <a href="dashboard.html" class="nav-item active" data-page="dashboard"><span class="nav-icon">◈</span> Dashboard</a>
-      </div>
-      <div class="nav-section">
-        <div class="nav-section-label">Transaksi</div>
-        <a href="shipments.html" class="nav-item" data-page="shipments"><span class="nav-icon">📦</span> Pengiriman</a>
-        <a href="invoices.html" class="nav-item" data-page="invoices" data-nav="invoices"><span class="nav-icon">🧾</span> Invoice</a>
-      </div>
-      <div class="nav-section">
-        <div class="nav-section-label">Data Master</div>
-        <a href="customers.html" class="nav-item" data-page="customers"><span class="nav-icon">👥</span> Pelanggan</a>
-        <a href="destinations.html" class="nav-item" data-page="destinations"><span class="nav-icon">📍</span> Tujuan</a>
-        <a href="services.html" class="nav-item" data-page="services"><span class="nav-icon">⚙️</span> Layanan & Tarif</a>
-      </div>
-      <div class="nav-section">
-        <div class="nav-section-label">Laporan</div>
-        <a href="reports.html" class="nav-item" data-page="reports"><span class="nav-icon">📊</span> Laporan</a>
-      </div>
-      <div class="nav-section admin-only">
-        <div class="nav-section-label">Administrasi</div>
-        <a href="users.html" class="nav-item admin-only" data-page="users" data-nav="users"><span class="nav-icon">🔑</span> Manajemen User</a>
-      </div>
-    </nav>
-    <div class="sidebar-user">
-      <div class="user-avatar" id="sidebarUserAvatar">A</div>
-      <div class="user-info"><strong id="sidebarUserName">User</strong><span id="sidebarUserRole">role</span></div>
-      <button class="btn-logout" onclick="API.logout()" title="Keluar">⏻</button>
-    </div>
-  </aside>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — PT Galaxy MultiTrans</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="icon" type="image/png" href="../image/logo1.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Diplomata&family=Lobster&family=Oswald:wght@500&family=Pliant:ital,wght@0,100..900;1,100..900&family=Six+Caps&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  </head>
+  <body>
+    <div class="app-layout">
+      <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+        onclick="closeSidebar()"
+      ></div>
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-icon">
+            <img src="../image/logo1.png" alt="Logo Galaxy MultiTrans" />
+          </div>
+          <div class="logo-text">
+            <strong>Galaxy MultiTrans</strong><span>Ekspedisi & Logistik</span>
+          </div>
+          <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section">
+            <div class="nav-section-label">Utama</div>
+            <a
+              href="dashboard.html"
+              class="nav-item active"
+              data-page="dashboard"
+              ><span class="nav-icon">◈</span> Dashboard</a
+            >
+          </div>
+          <div class="nav-section">
+            <div class="nav-section-label">Transaksi</div>
+            <a href="shipments.html" class="nav-item" data-page="shipments"
+              ><span class="nav-icon">📦</span> Pengiriman</a
+            >
+            <a
+              href="invoices.html"
+              class="nav-item"
+              data-page="invoices"
+              data-nav="invoices"
+              ><span class="nav-icon">🧾</span> Invoice</a
+            >
+          </div>
+          <div class="nav-section">
+            <div class="nav-section-label">Data Master</div>
+            <a href="customers.html" class="nav-item" data-page="customers"
+              ><span class="nav-icon">👥</span> Pelanggan</a
+            >
+            <a
+              href="destinations.html"
+              class="nav-item"
+              data-page="destinations"
+              ><span class="nav-icon">📍</span> Tujuan</a
+            >
+            <a href="services.html" class="nav-item" data-page="services"
+              ><span class="nav-icon">⚙️</span> Layanan & Tarif</a
+            >
+          </div>
+          <div class="nav-section">
+            <div class="nav-section-label">Laporan</div>
+            <a href="reports.html" class="nav-item" data-page="reports"
+              ><span class="nav-icon">📊</span> Laporan</a
+            >
+          </div>
+          <div class="nav-section admin-only">
+            <div class="nav-section-label">Administrasi</div>
+            <a
+              href="users.html"
+              class="nav-item admin-only"
+              data-page="users"
+              data-nav="users"
+              ><span class="nav-icon">🔑</span> Manajemen User</a
+            >
+          </div>
+        </nav>
+        <div class="sidebar-user">
+          <div class="user-avatar" id="sidebarUserAvatar">A</div>
+          <div class="user-info">
+            <strong id="sidebarUserName">User</strong
+            ><span id="sidebarUserRole">role</span>
+          </div>
+          <button class="btn-logout" onclick="API.logout()" title="Keluar">
+            ⏻
+          </button>
+        </div>
+      </aside>
 
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-  <div class="main-content">
-    <div class="topbar">
-      <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-      <div class="topbar-title">
-        <h2>Dashboard</h2>
-        <p>Selamat datang, <span id="welcomeName">Admin</span></p>
-      </div>
-      <div class="topbar-actions">
-        <button class="notif-btn" onclick="checkNotifications()">🔔<span class="notif-dot" id="notifDot" style="display:none"></span></button>
-      </div>
-    </div>
-
-    <div data-aos="fade-down" data-aos-anchor-placement="top-bottom">
-      <div class="page-content">
-        <div class="stats-grid" id="statsGrid">
-          <div class="stat-card"><div class="stat-icon blue">📦</div><div class="stat-info"><label>Total Pengiriman</label><strong id="statShipments">—</strong></div></div>
-          <div class="stat-card"><div class="stat-icon orange">🧾</div><div class="stat-info"><label>Total Invoice</label><strong id="statInvoices">—</strong></div></div>
-          <div class="stat-card"><div class="stat-icon green">💰</div><div class="stat-info"><label>Total Pendapatan</label><strong id="statRevenue">—</strong></div></div>
-          <div class="stat-card"><div class="stat-icon red">⏳</div><div class="stat-info"><label>Belum Dibayar</label><strong id="statPending">—</strong></div></div>
+      <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+        onclick="toggleSidebar()"
+      ></div>
+      <div class="main-content">
+        <div class="topbar">
+          <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+          <div class="topbar-title">
+            <h2>Dashboard</h2>
+            <p>Selamat datang, <span id="welcomeName">Admin</span></p>
+          </div>
+          <div class="topbar-actions">
+            <button class="notif-btn" onclick="checkNotifications()">
+              🔔<span
+                class="notif-dot"
+                id="notifDot"
+                style="display: none"
+              ></span>
+            </button>
+          </div>
         </div>
 
-        <div class="grid-2 mb-6">
-          <div class="card">
-            <div class="card-header"><h3>Status Pengiriman</h3><a href="shipments.html" class="btn btn-sm btn-outline">Lihat Semua</a></div>
-            <div class="card-body">
-              <div style="display:flex;gap:1rem;margin-bottom:1rem" id="statusBars"></div>
-              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem" id="statusCards"></div>
+        <div data-aos="fade-down" data-aos-anchor-placement="top-bottom">
+          <div class="page-content">
+            <div class="stats-grid" id="statsGrid">
+              <div class="stat-card">
+                <div class="stat-icon blue">📦</div>
+                <div class="stat-info">
+                  <label>Total Pengiriman</label
+                  ><strong id="statShipments">—</strong>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon orange">🧾</div>
+                <div class="stat-info">
+                  <label>Total Invoice</label
+                  ><strong id="statInvoices">—</strong>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon green">💰</div>
+                <div class="stat-info">
+                  <label>Total Pendapatan</label
+                  ><strong id="statRevenue">—</strong>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon red">⏳</div>
+                <div class="stat-info">
+                  <label>Belum Dibayar</label
+                  ><strong id="statPending">—</strong>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="card">
-            <div class="card-header"><h3>Notifikasi Pembayaran</h3></div>
-            <div class="card-body" id="notifList">
-              <div class="empty-state"><div class="empty-icon">✉️</div><p>Memuat notifikasi...</p></div>
-            </div>
-          </div>
-        </div>
 
-        <div class="grid-2">
-          <div class="card">
-            <div class="card-header"><h3>Pengiriman Terbaru</h3><a href="shipments.html" class="btn btn-sm btn-outline">Semua</a></div>
-            <div class="table-wrap">
-              <table id="recentShipments">
-                <thead><tr><th>Resi</th><th>Penerima</th><th>Tujuan</th><th>Status</th></tr></thead>
-                <tbody><tr><td colspan="4" class="text-center text-secondary" style="padding:2rem">Memuat...</td></tr></tbody>
-              </table>
+            <div class="grid-2 mb-6">
+              <div class="card">
+                <div class="card-header">
+                  <h3>Status Pengiriman</h3>
+                  <a href="shipments.html" class="btn btn-sm btn-outline"
+                    >Lihat Semua</a
+                  >
+                </div>
+                <div class="card-body">
+                  <div
+                    style="display: flex; gap: 1rem; margin-bottom: 1rem"
+                    id="statusBars"
+                  ></div>
+                  <div
+                    style="
+                      display: grid;
+                      grid-template-columns: repeat(3, 1fr);
+                      gap: 0.75rem;
+                    "
+                    id="statusCards"
+                  ></div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header"><h3>Notifikasi Pembayaran</h3></div>
+                <div class="card-body" id="notifList">
+                  <div class="empty-state">
+                    <div class="empty-icon">✉️</div>
+                    <p>Memuat notifikasi...</p>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="card">
-            <div class="card-header"><h3>Invoice Terbaru</h3><a href="invoices.html" class="btn btn-sm btn-outline">Semua</a></div>
-            <div class="table-wrap">
-              <table id="recentInvoices">
-                <thead><tr><th>No. Invoice</th><th>Resi</th><th>Jumlah</th><th>Status</th></tr></thead>
-                <tbody><tr><td colspan="4" class="text-center text-secondary" style="padding:2rem">Memuat...</td></tr></tbody>
-              </table>
+
+            <div class="grid-2">
+              <div class="card">
+                <div class="card-header">
+                  <h3>Pengiriman Terbaru</h3>
+                  <a href="shipments.html" class="btn btn-sm btn-outline"
+                    >Semua</a
+                  >
+                </div>
+                <div class="table-wrap">
+                  <table id="recentShipments">
+                    <thead>
+                      <tr>
+                        <th>Resi</th>
+                        <th>Penerima</th>
+                        <th>Tujuan</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td
+                          colspan="4"
+                          class="text-center text-secondary"
+                          style="padding: 2rem"
+                        >
+                          Memuat...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <h3>Invoice Terbaru</h3>
+                  <a href="invoices.html" class="btn btn-sm btn-outline"
+                    >Semua</a
+                  >
+                </div>
+                <div class="table-wrap">
+                  <table id="recentInvoices">
+                    <thead>
+                      <tr>
+                        <th>No. Invoice</th>
+                        <th>Resi</th>
+                        <th>Jumlah</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td
+                          colspan="4"
+                          class="text-center text-secondary"
+                          style="padding: 2rem"
+                        >
+                          Memuat...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<script src="../js/api.js"></script>
-<script>
-requireAuth();
-initUserInfo();
+    <script src="../js/api.js"></script>
+    <script>
+      requireAuth();
+      initUserInfo();
 
-const user = API.getUser();
-if (user) {
-  document.getElementById('welcomeName').textContent = user.name;
-  
-  if (user.role === 'staff') {
-    const invCard = document.getElementById('statInvoices')?.closest('.stat-card');
-    const revCard = document.getElementById('statRevenue')?.closest('.stat-card');
-    const pendCard = document.getElementById('statPending')?.closest('.stat-card');
-    
-    if (invCard) invCard.style.display = 'none';
-    if (revCard) revCard.style.display = 'none';
-    if (pendCard) pendCard.style.display = 'none';
-    
-    document.querySelectorAll('[href="invoices.html"]').forEach(el => {
-      if (el) el.style.display = 'none';
-    });
-  }
-}
+      const user = API.getUser();
+      if (user) {
+        document.getElementById("welcomeName").textContent = user.name;
 
-function openSidebar() {
-  document.querySelector('.sidebar').classList.add('open');
-  document.querySelector('.sidebar-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeSidebar() {
-  document.querySelector('.sidebar').classList.remove('open');
-  document.querySelector('.sidebar-overlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-document.querySelector('.menu-toggle').addEventListener('click', openSidebar);
+        if (user.role === "staff") {
+          const invCard = document
+            .getElementById("statInvoices")
+            ?.closest(".stat-card");
+          const revCard = document
+            .getElementById("statRevenue")
+            ?.closest(".stat-card");
+          const pendCard = document
+            .getElementById("statPending")
+            ?.closest(".stat-card");
 
-async function loadDashboard() {
-  try {
-    const data = await API.getDashboard();
-    
-    if (document.getElementById('statShipments')) {
-      document.getElementById('statShipments').textContent = data.total_shipments ?? '—';
-    }
-    if (document.getElementById('statInvoices')) {
-      document.getElementById('statInvoices').textContent = data.total_invoices ?? '—';
-    }
-    if (document.getElementById('statRevenue')) {
-      document.getElementById('statRevenue').textContent = formatRp(data.total_revenue);
-    }
-    if (document.getElementById('statPending')) {
-      document.getElementById('statPending').textContent = formatRp(data.pending_payment);
-    }
-    
-    const sc = data.status_count || { pending: 0, dikirim: 0, selesai: 0 };
-    const total = sc.pending + sc.dikirim + sc.selesai || 1;
-    const colors = { pending: '#DD6B20', dikirim: '#3182CE', selesai: '#38A169' };
-    const labels = { pending: 'Pending', dikirim: 'Dikirim', selesai: 'Selesai' };
-    
-    const statusBars = document.getElementById('statusBars');
-    if (statusBars) {
-      statusBars.innerHTML = Object.entries(sc).map(([k,v]) => `
+          if (invCard) invCard.style.display = "none";
+          if (revCard) revCard.style.display = "none";
+          if (pendCard) pendCard.style.display = "none";
+
+          document.querySelectorAll('[href="invoices.html"]').forEach((el) => {
+            if (el) el.style.display = "none";
+          });
+        }
+      }
+
+      function openSidebar() {
+        document.querySelector(".sidebar").classList.add("open");
+        document.querySelector(".sidebar-overlay").classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+      function closeSidebar() {
+        document.querySelector(".sidebar").classList.remove("open");
+        document.querySelector(".sidebar-overlay").classList.remove("open");
+        document.body.style.overflow = "";
+      }
+      document
+        .querySelector(".menu-toggle")
+        .addEventListener("click", openSidebar);
+
+      async function loadDashboard() {
+        try {
+          const data = await API.getDashboard();
+
+          if (document.getElementById("statShipments")) {
+            document.getElementById("statShipments").textContent =
+              data.total_shipments ?? "—";
+          }
+          if (document.getElementById("statInvoices")) {
+            document.getElementById("statInvoices").textContent =
+              data.total_invoices ?? "—";
+          }
+          if (document.getElementById("statRevenue")) {
+            document.getElementById("statRevenue").textContent = formatRp(
+              data.total_revenue,
+            );
+          }
+          if (document.getElementById("statPending")) {
+            document.getElementById("statPending").textContent = formatRp(
+              data.pending_payment,
+            );
+          }
+
+          const sc = data.status_count || {
+            pending: 0,
+            dikirim: 0,
+            selesai: 0,
+          };
+          const total = sc.pending + sc.dikirim + sc.selesai || 1;
+          const colors = {
+            pending: "#DD6B20",
+            dikirim: "#3182CE",
+            selesai: "#38A169",
+          };
+          const labels = {
+            pending: "Pending",
+            dikirim: "Dikirim",
+            selesai: "Selesai",
+          };
+
+          const statusBars = document.getElementById("statusBars");
+          if (statusBars) {
+            statusBars.innerHTML = Object.entries(sc)
+              .map(
+                ([k, v]) => `
         <div style="flex:1">
           <div style="height:8px;background:#eee;border-radius:4px;overflow:hidden">
-            <div style="height:100%;width:${Math.round(v/total*100)}%;background:${colors[k] || '#eee'};border-radius:4px"></div>
+            <div style="height:100%;width:${Math.round((v / total) * 100)}%;background:${colors[k] || "#eee"};border-radius:4px"></div>
           </div>
         </div>
-      `).join('');
-    }
-    
-    const statusCards = document.getElementById('statusCards');
-    if (statusCards) {
-      statusCards.innerHTML = Object.entries(sc).map(([k,v]) => `
+      `,
+              )
+              .join("");
+          }
+
+          const statusCards = document.getElementById("statusCards");
+          if (statusCards) {
+            statusCards.innerHTML = Object.entries(sc)
+              .map(
+                ([k, v]) => `
         <div style="text-align:center;padding:1rem;background:var(--bg);border-radius:var(--radius-sm)">
-          <div style="font-size:1.5rem;font-weight:800;font-family:var(--font-display);color:${colors[k] || '#000'}">${v}</div>
+          <div style="font-size:1.5rem;font-weight:800;font-family:var(--font-display);color:${colors[k] || "#000"}">${v}</div>
           <div style="font-size:.8rem;color:var(--text-secondary)">${labels[k] || k}</div>
         </div>
-      `).join('');
-    }
-    
-    // Pengiriman Terbaru - Dibatasi maksimal 2 data
-    const sBody = document.querySelector('#recentShipments tbody');
-    if (sBody) {
-      const recentShipments = data.recent_shipments || [];
-      if (recentShipments.length === 0) {
-        sBody.innerHTML = '<tr><td colspan="4" class="text-center text-secondary" style="padding:2rem">Belum ada pengiriman</td></tr>';
-      } else {
-        const limitedShipments = recentShipments.slice(0, 2);
-        sBody.innerHTML = limitedShipments.map(s => `
+      `,
+              )
+              .join("");
+          }
+
+          // Pengiriman Terbaru - Dibatasi maksimal 2 data
+          const sBody = document.querySelector("#recentShipments tbody");
+          if (sBody) {
+            const recentShipments = data.recent_shipments || [];
+            if (recentShipments.length === 0) {
+              sBody.innerHTML =
+                '<tr><td colspan="4" class="text-center text-secondary" style="padding:2rem">Belum ada pengiriman</td></tr>';
+            } else {
+              const limitedShipments = recentShipments.slice(0, 2);
+              sBody.innerHTML = limitedShipments
+                .map(
+                  (s) => `
           <tr>
             <td><span class="tag">${s.resi_number}</span></td>
             <td>${s.receiver_name}</td>
-            <td>${s.destination_detail?.city || '—'}</td>
+            <td>${s.destination_detail?.city || "—"}</td>
             <td><span class="badge badge-${s.status}">${s.status}</span></td>
           </tr>
-        `).join('');
-      }
-    }
-    
-    // Invoice Terbaru - Dibatasi maksimal 2 data
-    const iBody = document.querySelector('#recentInvoices tbody');
-    if (iBody) {
-      const recentInvoices = data.recent_invoices || [];
-      if (recentInvoices.length === 0) {
-        iBody.innerHTML = '<tr><td colspan="4" class="text-center text-secondary" style="padding:2rem">Belum ada invoice</td></tr>';
-      } else {
-        const limitedInvoices = recentInvoices.slice(0, 2);
-        iBody.innerHTML = limitedInvoices.map(i => `
+        `,
+                )
+                .join("");
+            }
+          }
+
+          // Invoice Terbaru - Dibatasi maksimal 2 data
+          const iBody = document.querySelector("#recentInvoices tbody");
+          if (iBody) {
+            const recentInvoices = data.recent_invoices || [];
+            if (recentInvoices.length === 0) {
+              iBody.innerHTML =
+                '<tr><td colspan="4" class="text-center text-secondary" style="padding:2rem">Belum ada invoice</td></tr>';
+            } else {
+              const limitedInvoices = recentInvoices.slice(0, 2);
+              iBody.innerHTML = limitedInvoices
+                .map(
+                  (i) => `
           <tr>
             <td><a href="invoices.html" style="color:var(--info)">${i.invoice_number}</a></td>
             <td>${i.resi_number}</td>
             <td>${formatRp(i.total_amount)}</td>
-            <td><span class="badge badge-${i.payment_status === 'lunas' ? 'lunas' : 'belum'}">${i.payment_status === 'lunas' ? 'Lunas' : 'Belum Bayar'}</span></td>
+            <td><span class="badge badge-${i.payment_status === "lunas" ? "lunas" : "belum"}">${i.payment_status === "lunas" ? "Lunas" : "Belum Bayar"}</span></td>
           </tr>
-        `).join('');
-      }
-    }
-    
-    // Notifikasi Pembayaran (Belum Bayar) - Dibatasi maksimal 2 data
-    const notifList = document.getElementById('notifList');
-    if (notifList) {
-      const recentInvoices = data.recent_invoices || [];
-      const unpaidInvoices = recentInvoices.filter(i => i.payment_status === 'belum_bayar');
-      
-      if (unpaidInvoices.length === 0) {
-        notifList.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><p>Semua invoice sudah dibayar</p></div>';
-        const notifDot = document.getElementById('notifDot');
-        if (notifDot) notifDot.style.display = 'none';
-      } else {
-        const notifDot = document.getElementById('notifDot');
-        if (notifDot) notifDot.style.display = 'block';
-        
-        const limitedUnpaid = unpaidInvoices.slice(0, 2);
-        notifList.innerHTML = limitedUnpaid.map(i => `
+        `,
+                )
+                .join("");
+            }
+          }
+
+          // Notifikasi Pembayaran (Belum Bayar) - Dibatasi maksimal 2 data
+          const notifList = document.getElementById("notifList");
+          if (notifList) {
+            const recentInvoices = data.recent_invoices || [];
+            const unpaidInvoices = recentInvoices.filter(
+              (i) => i.payment_status === "belum_bayar",
+            );
+
+            if (unpaidInvoices.length === 0) {
+              notifList.innerHTML =
+                '<div class="empty-state"><div class="empty-icon">✅</div><p>Semua invoice sudah dibayar</p></div>';
+              const notifDot = document.getElementById("notifDot");
+              if (notifDot) notifDot.style.display = "none";
+            } else {
+              const notifDot = document.getElementById("notifDot");
+              if (notifDot) notifDot.style.display = "block";
+
+              const limitedUnpaid = unpaidInvoices.slice(0, 2);
+              notifList.innerHTML = limitedUnpaid
+                .map(
+                  (i) => `
           <div style="display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border)">
             <div style="width:8px;height:8px;background:var(--danger);border-radius:50%;flex-shrink:0"></div>
             <div style="flex:1">
@@ -258,27 +452,28 @@ async function loadDashboard() {
             </div>
             <a href="invoices.html" class="btn btn-sm btn-outline">Lihat</a>
           </div>
-        `).join('');
+        `,
+                )
+                .join("");
+            }
+          }
+        } catch (e) {
+          console.error(e);
+          showToast("Gagal memuat dashboard: " + e.message, "error");
+        }
       }
-    }
-    
-  } catch(e) {
-    console.error(e);
-    showToast('Gagal memuat dashboard: ' + e.message, 'error');
-  }
-}
 
-function checkNotifications() {
-  window.location.href = 'invoices.html';
-}
+      function checkNotifications() {
+        window.location.href = "invoices.html";
+      }
 
-AOS.init({
-  duration: 700,
-  easing: 'ease-in-out',
-  once: true
-});
+      AOS.init({
+        duration: 700,
+        easing: "ease-in-out",
+        once: true,
+      });
 
-loadDashboard();
-</script>
-</body>
+      loadDashboard();
+    </script>
+  </body>
 </html>

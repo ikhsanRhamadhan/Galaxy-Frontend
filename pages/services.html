@@ -1,200 +1,595 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Layanan & Tarif — PT Galaxy MultiTrans</title>
-<link rel="stylesheet" href="../css/style.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="icon" type="image/png" href="../image/logo1.png">
-<link href="https://fonts.googleapis.com/css2?family=Diplomata&family=Lobster&family=Oswald:wght@500&family=Pliant:ital,wght@0,100..900;1,100..900&family=Six+Caps&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-</head>
-<body>
-<div class="app-layout">
-  <aside class="sidebar">
-    <div class="sidebar-logo"><div class="logo-icon"><img src="../image/logo1.png" alt="Logo Galaxy MultiTrans"></div><div class="logo-text"><strong>Galaxy MultiTrans</strong><span>Ekspedisi & Logistik</span></div></div>
-    <nav class="sidebar-nav">
-      <div class="nav-section"><div class="nav-section-label">Utama</div><a href="dashboard.html" class="nav-item"><span class="nav-icon">◈</span> Dashboard</a></div>
-      <div class="nav-section"><div class="nav-section-label">Transaksi</div><a href="shipments.html" class="nav-item" data-nav="shipments"><span class="nav-icon">📦</span> Pengiriman</a><a href="invoices.html" class="nav-item" data-nav="invoices"><span class="nav-icon">🧾</span> Invoice</a></div>
-      <div class="nav-section" data-nav="master"><div class="nav-section-label">Data Master</div>
-        <a href="customers.html" class="nav-item"><span class="nav-icon">👥</span> Pelanggan</a>
-        <a href="destinations.html" class="nav-item"><span class="nav-icon">📍</span> Tujuan</a>
-        <a href="services.html" class="nav-item active"><span class="nav-icon">⚙️</span> Layanan & Tarif</a>
-      </div>
-      <div class="nav-section"><div class="nav-section-label">Laporan</div><a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Laporan</a></div>
-      <div class="nav-section admin-only" data-nav="users"><div class="nav-section-label">Administrasi</div><a href="users.html" class="nav-item admin-only"><span class="nav-icon">🔑</span> Manajemen User</a></div>
-    </nav>
-    <div class="sidebar-user"><div class="user-avatar" id="sidebarUserAvatar">A</div><div class="user-info"><strong id="sidebarUserName">User</strong><span id="sidebarUserRole">role</span></div><button class="btn-logout" onclick="API.logout()">⏻</button></div>
-  </aside>
-  <div class="main-content">
-    <div class="topbar">
-      <div class="topbar-title"><h2>Layanan & Tarif</h2><p>Konfigurasi jenis layanan dan harga per kg</p></div>
-      <div class="topbar-actions"><button class="btn btn-primary" onclick="openAdd()" id="addNewBtn">+ Layanan Baru</button></div>
-    </div>
-    
-    <div class="page-content" data-aos="fade-down">
-      <div id="serviceCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin-bottom:1.5rem"></div>
-      <div class="card">
-        <div class="card-header"><h3>Semua Layanan</h3></div>
-        <div class="table-wrap">
-          <table>
-            <thead id="tableHead">
-              <tr><th>Kode</th><th>Nama Layanan</th><th>Deskripsi</th><th>Harga/kg</th><th>Min. Berat</th><th class="action-column">Aksi</th></tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Layanan & Tarif — PT Galaxy MultiTrans</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="icon" type="image/png" href="../image/logo1.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <style>
+      /* ===== SERVICES PAGE — MOBILE STYLES ===== */
+
+      /* Grid kartu layanan: auto-fill di desktop, 1 kolom di mobile kecil */
+      #serviceCards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      @media (max-width: 480px) {
+        #serviceCards {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Tabel mobile → card list */
+      .mobile-list {
+        margin-top: 0.25rem;
+      }
+      .svc-row-card {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .svc-row-card:last-child {
+        border-bottom: none;
+      }
+      .svc-row-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
+      .svc-row-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .svc-row-name {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--primary);
+      }
+      .svc-row-meta {
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        margin-top: 0.1rem;
+      }
+      .svc-row-price {
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 0.95rem;
+        text-align: right;
+        flex-shrink: 0;
+      }
+      .svc-row-actions {
+        display: flex;
+        gap: 0.3rem;
+        flex-shrink: 0;
+      }
+
+      @media (max-width: 640px) {
+        .table-wrap table {
+          display: none;
+        }
+        .mobile-list {
+          display: block;
+        }
+
+        .btn-svc-text {
+          display: none;
+        }
+        .btn-svc-icon {
+          display: inline;
+        }
+
+        .modal-overlay {
+          padding: 0;
+          align-items: flex-end;
+        }
+        .modal {
+          border-radius: 16px 16px 0 0 !important;
+          max-height: 92vh;
+        }
+      }
+
+      @media (min-width: 641px) {
+        .btn-svc-icon {
+          display: none;
+        }
+        .mobile-list {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <!-- ===== SIDEBAR ===== -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-icon">
+            <img src="../image/logo1.png" alt="Logo Galaxy MultiTrans" />
+          </div>
+          <div class="logo-text">
+            <strong>Galaxy MultiTrans</strong>
+            <span>Ekspedisi & Logistik</span>
+          </div>
+          <button
+            class="sidebar-close"
+            onclick="closeSidebar()"
+            aria-label="Tutup menu"
+          >
+            ✕
+          </button>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section">
+            <div class="nav-section-label">Utama</div>
+            <a href="dashboard.html" class="nav-item" onclick="closeSidebar()"
+              ><span class="nav-icon">◈</span> Dashboard</a
+            >
+          </div>
+          <div class="nav-section">
+            <div class="nav-section-label">Transaksi</div>
+            <a href="shipments.html" class="nav-item" onclick="closeSidebar()"
+              ><span class="nav-icon">📦</span> Pengiriman</a
+            >
+            <a href="invoices.html" class="nav-item" onclick="closeSidebar()"
+              ><span class="nav-icon">🧾</span> Invoice</a
+            >
+          </div>
+          <div class="nav-section">
+            <div class="nav-section-label">Data Master</div>
+            <a href="customers.html" class="nav-item" onclick="closeSidebar()"
+              ><span class="nav-icon">👥</span> Pelanggan</a
+            >
+            <a
+              href="destinations.html"
+              class="nav-item"
+              onclick="closeSidebar()"
+              ><span class="nav-icon">📍</span> Tujuan</a
+            >
+            <a
+              href="services.html"
+              class="nav-item active"
+              onclick="closeSidebar()"
+              ><span class="nav-icon">⚙️</span> Layanan & Tarif</a
+            >
+          </div>
+          <div class="nav-section">
+            <div class="nav-section-label">Laporan</div>
+            <a href="reports.html" class="nav-item" onclick="closeSidebar()"
+              ><span class="nav-icon">📊</span> Laporan</a
+            >
+          </div>
+          <div class="nav-section admin-only">
+            <div class="nav-section-label">Administrasi</div>
+            <a
+              href="users.html"
+              class="nav-item admin-only"
+              onclick="closeSidebar()"
+              ><span class="nav-icon">🔑</span> Manajemen User</a
+            >
+          </div>
+        </nav>
+        <div class="sidebar-user">
+          <div class="user-avatar" id="sidebarUserAvatar">A</div>
+          <div class="user-info">
+            <strong id="sidebarUserName">User</strong>
+            <span id="sidebarUserRole">role</span>
+          </div>
+          <button class="btn-logout" onclick="API.logout()" aria-label="Logout">
+            ⏻
+          </button>
+        </div>
+      </aside>
+
+      <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+        onclick="closeSidebar()"
+      ></div>
+
+      <!-- ===== MAIN CONTENT ===== -->
+      <div class="main-content">
+        <div class="topbar">
+          <button
+            class="menu-toggle"
+            onclick="openSidebar()"
+            aria-label="Buka menu"
+          >
+            ☰
+          </button>
+          <div class="topbar-title">
+            <h2>Layanan & Tarif</h2>
+            <p>Konfigurasi jenis layanan dan harga per kg</p>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn btn-primary" onclick="openAdd()" id="addNewBtn">
+              <span class="btn-svc-text">+ Layanan Baru</span>
+              <span class="btn-svc-icon">+</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="page-content" data-aos="fade-down">
+          <!-- Kartu ringkasan layanan (tetap tampil di semua ukuran, auto-wrap) -->
+          <div id="serviceCards"></div>
+
+          <!-- Tabel + card list -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Semua Layanan</h3>
+            </div>
+
+            <!-- Tabel desktop -->
+            <div class="table-wrap">
+              <table>
+                <thead id="tableHead">
+                  <tr>
+                    <th>Kode</th>
+                    <th>Nama Layanan</th>
+                    <th>Deskripsi</th>
+                    <th>Harga/kg</th>
+                    <th>Min. Berat</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+              </table>
+            </div>
+
+            <!-- List ringkas mobile -->
+            <div class="mobile-list" id="mobileList">
+              <div
+                style="
+                  text-align: center;
+                  padding: 2rem;
+                  color: var(--text-secondary);
+                "
+              >
+                Memuat data...
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="modal-overlay" id="modalForm">
-  <div class="modal modal-sm">
-    <div class="modal-header"><h3 id="modalTitle">Tambah Layanan</h3><button class="modal-close" onclick="closeModal('modalForm')">✕</button></div>
-    <div class="modal-body">
-      <div id="formAlert"></div>
-      <input type="hidden" id="editId">
-      <div class="two-col">
-        <div class="form-group"><label class="form-label">Kode <span>*</span></label><input class="form-control" id="fCode" placeholder="REG" style="text-transform:uppercase"></div>
-        <div class="form-group"><label class="form-label">Nama Layanan <span>*</span></label><input class="form-control" id="fName" placeholder="Reguler"></div>
-      </div>
-      <div class="form-group"><label class="form-label">Deskripsi</label><input class="form-control" id="fDesc" placeholder="Keterangan layanan"></div>
-      <div class="two-col">
-        <div class="form-group"><label class="form-label">Harga per kg (Rp) <span>*</span></label><input class="form-control" id="fPrice" type="number" min="0" placeholder="15000"></div>
-        <div class="form-group"><label class="form-label">Min. Berat (kg)</label><input class="form-control" id="fMinW" type="number" min="0" step="0.1" value="1" placeholder="1"></div>
+    <!-- ===== MODAL: Form Layanan ===== -->
+    <div class="modal-overlay" id="modalForm">
+      <div class="modal modal-sm">
+        <div class="modal-header">
+          <h3 id="modalTitle">Tambah Layanan</h3>
+          <button class="modal-close" onclick="closeModal('modalForm')">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="formAlert"></div>
+          <input type="hidden" id="editId" />
+          <div class="two-col">
+            <div class="form-group">
+              <label class="form-label"
+                >Kode <span style="color: var(--danger)">*</span></label
+              >
+              <input
+                class="form-control"
+                id="fCode"
+                placeholder="REG"
+                style="text-transform: uppercase"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                >Nama Layanan <span style="color: var(--danger)">*</span></label
+              >
+              <input class="form-control" id="fName" placeholder="Reguler" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Deskripsi</label>
+            <input
+              class="form-control"
+              id="fDesc"
+              placeholder="Keterangan layanan"
+            />
+          </div>
+          <div class="two-col">
+            <div class="form-group">
+              <label class="form-label"
+                >Harga per kg (Rp)
+                <span style="color: var(--danger)">*</span></label
+              >
+              <input
+                class="form-control"
+                id="fPrice"
+                type="number"
+                min="0"
+                placeholder="15000"
+                inputmode="numeric"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Min. Berat (kg)</label>
+              <input
+                class="form-control"
+                id="fMinW"
+                type="number"
+                min="0"
+                step="0.1"
+                value="1"
+                placeholder="1"
+                inputmode="decimal"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('modalForm')">
+            Batal
+          </button>
+          <button class="btn btn-primary" onclick="saveData()" id="saveBtn">
+            Simpan
+          </button>
+        </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modalForm')">Batal</button>
-      <button class="btn btn-primary" onclick="saveData()" id="saveBtn">Simpan</button>
-    </div>
-  </div>
-</div>
 
-<script src="../js/api.js"></script>
-<script>
-requireAuth(); initUserInfo(); applyRoleUI();
-let allData = [];
-const svcIcons = { REG: '📦', EXP: '⚡', CGO: '🚚' };
-const svcColors = { REG: '#3182CE', EXP: '#E53E3E', CGO: '#DD6B20' };
+    <script src="../js/api.js"></script>
+    <script>
+      /* ===== SIDEBAR ===== */
+      function openSidebar() {
+        document.getElementById("sidebar").classList.add("open");
+        document.getElementById("sidebarOverlay").classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+      function closeSidebar() {
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("sidebarOverlay").classList.remove("open");
+        document.body.style.overflow = "";
+      }
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 768) closeSidebar();
+      });
 
-async function loadAll() {
-  try { allData = await API.getServices(); renderCards(); renderTable(allData); }
-  catch(e) { showToast(e.message, 'error'); }
-}
+      /* ===== INIT ===== */
+      requireAuth();
+      initUserInfo();
+      applyRoleUI();
+      let allData = [];
 
-function renderCards() {
-  document.getElementById('serviceCards').innerHTML = allData.map(s => `
-    <div class="card" style="border-top:4px solid ${svcColors[s.code]||'var(--primary)'}">
+      const svcIcons = { REG: "📦", EXP: "⚡", CGO: "🚚" };
+      const svcColors = { REG: "#3182CE", EXP: "#E53E3E", CGO: "#DD6B20" };
+      const getColor = (code) => svcColors[code] || "var(--primary)";
+      const getIcon = (code) => svcIcons[code] || "📦";
+
+      /* ===== LOAD ===== */
+      async function loadAll() {
+        try {
+          allData = await API.getServices();
+          renderCards();
+          renderTable(allData);
+        } catch (e) {
+          showToast(e.message, "error");
+        }
+      }
+
+      /* ===== RENDER KARTU RINGKASAN ===== */
+      function renderCards() {
+        document.getElementById("serviceCards").innerHTML = allData
+          .map(
+            (s) => `
+    <div class="card" style="border-top:4px solid ${getColor(s.code)}">
       <div class="card-body">
         <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
-          <div style="width:44px;height:44px;background:${svcColors[s.code]||'var(--primary)'}22;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1.4rem">${svcIcons[s.code]||'📦'}</div>
-          <div><strong style="font-family:var(--font-display);font-size:1rem">${s.name}</strong><br><span style="font-size:.78rem;color:var(--text-secondary)">[${s.code}] ${s.description||''}</span></div>
+          <div style="width:44px;height:44px;background:${getColor(s.code)}22;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">
+            ${getIcon(s.code)}
+          </div>
+          <div style="min-width:0">
+            <strong style="font-family:var(--font-display);font-size:1rem;display:block">${s.name}</strong>
+            <span style="font-size:.78rem;color:var(--text-secondary)">[${s.code}] ${s.description || ""}</span>
+          </div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <div><div style="font-size:.78rem;color:var(--text-secondary)">Tarif per kg</div><div style="font-size:1.2rem;font-weight:700;color:${svcColors[s.code]||'var(--primary)'}">${formatRp(s.price_per_kg)}</div></div>
-          <div style="text-align:right"><div style="font-size:.78rem;color:var(--text-secondary)">Min. Berat</div><div style="font-weight:600">${s.min_weight} kg</div></div>
+          <div>
+            <div style="font-size:.78rem;color:var(--text-secondary)">Tarif per kg</div>
+            <div style="font-size:1.2rem;font-weight:700;color:${getColor(s.code)}">${formatRp(s.price_per_kg)}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:.78rem;color:var(--text-secondary)">Min. Berat</div>
+            <div style="font-weight:600">${s.min_weight} kg</div>
+          </div>
         </div>
       </div>
-    </div>
-  `).join('');
-}
+    </div>`,
+          )
+          .join("");
+      }
 
-function renderTable(data) {
-  const tbody = document.getElementById('tableBody');
-  const thead = document.getElementById('tableHead');
-  const _cUser = API.getUser();
-  const isRestricted = _cUser && (_cUser.role === 'keuangan' || _cUser.role === 'staff');
+      /* ===== RENDER TABLE (Desktop) ===== */
+      function renderTable(data) {
+        const tbody = document.getElementById("tableBody");
+        const thead = document.getElementById("tableHead");
+        const cUser = API.getUser();
+        const isRestricted =
+          cUser && (cUser.role === "keuangan" || cUser.role === "staff");
 
-  if (isRestricted) {
-    thead.innerHTML = '<tr><th>Kode</th><th>Nama Layanan</th><th>Deskripsi</th><th>Harga/kg</th><th>Min. Berat</th></tr>';
-  } else {
-    thead.innerHTML = '<tr><th>Kode</th><th>Nama Layanan</th><th>Deskripsi</th><th>Harga/kg</th><th>Min. Berat</th><th class="action-column">Aksi</th></tr>';
-  }
+        thead.innerHTML = isRestricted
+          ? "<tr><th>Kode</th><th>Nama Layanan</th><th>Deskripsi</th><th>Harga/kg</th><th>Min. Berat</th></tr>"
+          : "<tr><th>Kode</th><th>Nama Layanan</th><th>Deskripsi</th><th>Harga/kg</th><th>Min. Berat</th><th>Aksi</th></tr>";
 
-  if (!data.length) { 
-    const colSpan = isRestricted ? 5 : 6;
-    tbody.innerHTML = `<tr><td colspan="${colSpan}" class="text-center text-secondary" style="padding:2rem">Tidak ada layanan</td></tr>`; 
-    return; 
-  }
+        const addBtn = document.getElementById("addNewBtn");
+        if (addBtn) addBtn.style.display = isRestricted ? "none" : "";
 
-  const addNewBtn = document.getElementById('addNewBtn');
-  if (addNewBtn && isRestricted) {
-    addNewBtn.style.display = 'none';
-  }
+        if (!data.length) {
+          const cols = isRestricted ? 5 : 6;
+          tbody.innerHTML = `<tr><td colspan="${cols}" style="text-align:center;padding:2rem;color:var(--text-secondary)">Tidak ada layanan</td></tr>`;
+          document.getElementById("mobileList").innerHTML =
+            '<div style="text-align:center;padding:2rem;color:var(--text-secondary)">Tidak ada layanan</div>';
+          return;
+        }
 
-  tbody.innerHTML = data.map(s => {
-    let rowHtml = `<tr>
+        tbody.innerHTML = data
+          .map(
+            (s) => `
+    <tr>
       <td><span class="tag">${s.code}</span></td>
       <td><strong>${s.name}</strong></td>
-      <td style="color:var(--text-secondary)">${s.description||'—'}</td>
+      <td style="color:var(--text-secondary)">${s.description || "—"}</td>
       <td style="font-weight:600;color:var(--primary)">${formatRp(s.price_per_kg)}</td>
-      <td>${s.min_weight} kg</td>`;
-    
-    if (!isRestricted) {
-      rowHtml += `<td class="action-column"><div class="td-actions">
-        <button class="btn btn-icon btn-sm" onclick="editData('${s.id}')">✏️</button>
-        <button class="btn btn-icon btn-sm" onclick="deleteData('${s.id}')" style="color:var(--danger)">🗑</button>
-      </div></td>`;
-    }
-    
-    rowHtml += '</tr>';
-    return rowHtml;
-  }).join('');
-}
+      <td>${s.min_weight} kg</td>
+      ${
+        !isRestricted
+          ? `
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-icon btn-sm" onclick="editData('${s.id}')" title="Edit">✏️</button>
+          <button class="btn btn-icon btn-sm" onclick="deleteData('${s.id}')" title="Hapus" style="color:var(--danger)">🗑</button>
+        </div>
+      </td>`
+          : ""
+      }
+    </tr>`,
+          )
+          .join("");
 
-function openAdd() {
-  document.getElementById('editId').value = '';
-  document.getElementById('modalTitle').textContent = 'Tambah Layanan';
-  ['fCode','fName','fDesc'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('fPrice').value = '';
-  document.getElementById('fMinW').value = '1';
-  document.getElementById('formAlert').innerHTML = '';
-  openModal('modalForm');
-}
+        renderMobileList(data, isRestricted);
+      }
 
-function editData(id) {
-  const s = allData.find(x => x.id === id); if (!s) return;
-  document.getElementById('editId').value = id;
-  document.getElementById('modalTitle').textContent = 'Edit Layanan';
-  document.getElementById('fCode').value = s.code;
-  document.getElementById('fName').value = s.name;
-  document.getElementById('fDesc').value = s.description || '';
-  document.getElementById('fPrice').value = s.price_per_kg;
-  document.getElementById('fMinW').value = s.min_weight;
-  document.getElementById('formAlert').innerHTML = '';
-  openModal('modalForm');
-}
+      /* ===== RENDER LIST MOBILE ===== */
+      function renderMobileList(data, isRestricted) {
+        const el = document.getElementById("mobileList");
+        if (!el) return;
+        el.innerHTML = data
+          .map(
+            (s) => `
+    <div class="svc-row-card">
+      <div class="svc-row-icon" style="background:${getColor(s.code)}22">
+        ${getIcon(s.code)}
+      </div>
+      <div class="svc-row-body">
+        <div class="svc-row-name">${s.name} <span class="tag" style="font-size:.7rem;padding:.1rem .4rem">${s.code}</span></div>
+        <div class="svc-row-meta">${s.description || "—"} · Min. ${s.min_weight} kg</div>
+      </div>
+      <div class="svc-row-price" style="color:${getColor(s.code)}">${formatRp(s.price_per_kg)}</div>
+      ${
+        !isRestricted
+          ? `
+      <div class="svc-row-actions">
+        <button class="btn btn-icon btn-sm" onclick="editData('${s.id}')" title="Edit">✏️</button>
+        <button class="btn btn-icon btn-sm" onclick="deleteData('${s.id}')" title="Hapus" style="color:var(--danger)">🗑</button>
+      </div>`
+          : ""
+      }
+    </div>`,
+          )
+          .join("");
+      }
 
-async function saveData() {
-  const btn = document.getElementById('saveBtn'); btn.disabled = true;
-  try {
-    const data = { code: document.getElementById('fCode').value.trim().toUpperCase(), name: document.getElementById('fName').value.trim(), description: document.getElementById('fDesc').value.trim(), price_per_kg: parseFloat(document.getElementById('fPrice').value), min_weight: parseFloat(document.getElementById('fMinW').value) || 1 };
-    if (!data.code || !data.name || !data.price_per_kg) { document.getElementById('formAlert').innerHTML = '<div class="alert alert-error">Lengkapi field wajib</div>'; return; }
-    const id = document.getElementById('editId').value;
-    if (id) await API.updateService(id, data); else await API.createService(data);
-    closeModal('modalForm'); showToast('Layanan berhasil disimpan!'); loadAll();
-  } catch(e) { document.getElementById('formAlert').innerHTML = `<div class="alert alert-error">${e.message}</div>`; }
-  finally { btn.disabled = false; }
-}
+      /* ===== OPEN ADD ===== */
+      function openAdd() {
+        document.getElementById("editId").value = "";
+        document.getElementById("modalTitle").textContent = "Tambah Layanan";
+        ["fCode", "fName", "fDesc"].forEach(
+          (id) => (document.getElementById(id).value = ""),
+        );
+        document.getElementById("fPrice").value = "";
+        document.getElementById("fMinW").value = "1";
+        document.getElementById("formAlert").innerHTML = "";
+        openModal("modalForm");
+      }
 
-async function deleteData(id) {
-  if (!confirmAction('Yakin hapus layanan ini?')) return;
-  try { await API.deleteService(id); showToast('Layanan dihapus'); loadAll(); }
-  catch(e) { showToast(e.message, 'error'); }
-}
+      /* ===== EDIT ===== */
+      function editData(id) {
+        const s = allData.find((x) => x.id === id);
+        if (!s) return;
+        document.getElementById("editId").value = id;
+        document.getElementById("modalTitle").textContent = "Edit Layanan";
+        document.getElementById("fCode").value = s.code;
+        document.getElementById("fName").value = s.name;
+        document.getElementById("fDesc").value = s.description || "";
+        document.getElementById("fPrice").value = s.price_per_kg;
+        document.getElementById("fMinW").value = s.min_weight;
+        document.getElementById("formAlert").innerHTML = "";
+        openModal("modalForm");
+      }
 
-AOS.init({
-  duration: 700,
-  easing: 'ease-in-out',
-  once: true
-});
-loadAll();
-</script>
-</body>
+      /* ===== SAVE ===== */
+      async function saveData() {
+        const btn = document.getElementById("saveBtn");
+        btn.disabled = true;
+        try {
+          const data = {
+            code: document.getElementById("fCode").value.trim().toUpperCase(),
+            name: document.getElementById("fName").value.trim(),
+            description: document.getElementById("fDesc").value.trim(),
+            price_per_kg: parseFloat(document.getElementById("fPrice").value),
+            min_weight: parseFloat(document.getElementById("fMinW").value) || 1,
+          };
+          if (!data.code || !data.name || !data.price_per_kg) {
+            document.getElementById("formAlert").innerHTML =
+              '<div class="alert alert-error">Lengkapi field wajib</div>';
+            document
+              .getElementById("formAlert")
+              .scrollIntoView({ behavior: "smooth", block: "nearest" });
+            return;
+          }
+          const id = document.getElementById("editId").value;
+          if (id) await API.updateService(id, data);
+          else await API.createService(data);
+          closeModal("modalForm");
+          showToast("Layanan berhasil disimpan!");
+          loadAll();
+        } catch (e) {
+          document.getElementById("formAlert").innerHTML =
+            `<div class="alert alert-error">${e.message}</div>`;
+        } finally {
+          btn.disabled = false;
+        }
+      }
+
+      /* ===== DELETE ===== */
+      async function deleteData(id) {
+        if (!confirmAction("Yakin hapus layanan ini?")) return;
+        try {
+          await API.deleteService(id);
+          showToast("Layanan dihapus");
+          loadAll();
+        } catch (e) {
+          showToast(e.message, "error");
+        }
+      }
+
+      /* ===== AOS ===== */
+      if (typeof AOS !== "undefined") {
+        AOS.init({
+          duration: 700,
+          easing: "ease-in-out",
+          once: true,
+          disable: window.innerWidth < 768,
+        });
+      }
+
+      loadAll();
+    </script>
+  </body>
 </html>
