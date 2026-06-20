@@ -19,27 +19,27 @@
     <nav class="sidebar-nav">
       <div class="nav-section"><div class="nav-section-label">Utama</div><a href="dashboard.html" class="nav-item"><span class="nav-icon">◈</span> Dashboard</a></div>
       <div class="nav-section"><div class="nav-section-label">Transaksi</div>
-        <a href="shipments.html" class="nav-item"><span class="nav-icon">📦</span> Pengiriman</a>
-        <a href="invoices.html" class="nav-item"><span class="nav-icon">🧾</span> Invoice</a>
+        <a href="shipments.html" class="nav-item" data-nav="shipments"><span class="nav-icon">📦</span> Pengiriman</a>
+        <a href="invoices.html" class="nav-item" data-nav="invoices"><span class="nav-icon">🧾</span> Invoice</a>
       </div>
-      <div class="nav-section"><div class="nav-section-label">Data Master</div>
+      <div class="nav-section" data-nav="master"><div class="nav-section-label">Data Master</div>
         <a href="customers.html" class="nav-item active"><span class="nav-icon">👥</span> Pelanggan</a>
         <a href="destinations.html" class="nav-item"><span class="nav-icon">📍</span> Tujuan</a>
         <a href="services.html" class="nav-item"><span class="nav-icon">⚙️</span> Layanan & Tarif</a>
       </div>
       <div class="nav-section"><div class="nav-section-label">Laporan</div><a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Laporan</a></div>
-      <div class="nav-section admin-only"><div class="nav-section-label">Administrasi</div><a href="users.html" class="nav-item admin-only"><span class="nav-icon">🔑</span> Manajemen User</a></div>
+      <div class="nav-section admin-only" data-nav="users"><div class="nav-section-label">Administrasi</div><a href="users.html" class="nav-item admin-only"><span class="nav-icon">🔑</span> Manajemen User</a></div>
     </nav>
     <div class="sidebar-user"><div class="user-avatar" id="sidebarUserAvatar">A</div><div class="user-info"><strong id="sidebarUserName">User</strong><span id="sidebarUserRole">role</span></div><button class="btn-logout" onclick="API.logout()">⏻</button></div>
   </aside>
+  
   <div class="main-content">
     <div class="topbar">
       <div class="topbar-title"><h2>Data Pelanggan</h2><p>Kelola data pelanggan perusahaan</p></div>
-      <div class="topbar-actions"><button class="btn btn-primary" onclick="openAdd()" data-perm-master-write>+ Pelanggan Baru</button></div>
+      <div class="topbar-actions"><button class="btn btn-primary" onclick="openAdd()" data-perm-master-write id="addNewBtn">+ Pelanggan Baru</button></div>
     </div>
-     <div data-aos="fade-down"
-        data-aos-anchor-placement="center-center">
-    <div class="page-content">
+    
+    <div class="page-content" data-aos="fade-down">
       <div class="card">
         <div class="card-header">
           <h3>Daftar Pelanggan</h3>
@@ -47,10 +47,13 @@
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Nama</th><th>Alamat</th><th>Telepon</th><th>Email</th><th>PIC</th><th>NPWP</th><th>Aksi</th></tr></thead>
-            <tbody id="tableBody"><tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-secondary)">Memuat data...</td></tr></tbody>
+            <thead id="tableHead">
+              <tr><th>Nama</th><th>Alamat</th><th>Telepon</th><th>Email</th><th>PIC</th><th>NPWP</th><th class="action-column">Aksi</th></tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-secondary)">Memuat data...</td></tr>
+            </tbody>
           </table>
-        </div>
         </div>
       </div>
     </div>
@@ -81,7 +84,7 @@
 
 <script src="../js/api.js"></script>
 <script>
-requireAuth(); initUserInfo();
+requireAuth(); initUserInfo(); applyRoleUI();
 let allData = [];
 
 async function loadAll() {
@@ -91,28 +94,66 @@ async function loadAll() {
 
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
-  if (!data.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-secondary" style="padding:2rem">Tidak ada data pelanggan</td></tr>'; return; }
-  // Tampilkan banner untuk non-admin
-const _cUser = API.getUser();
-if (_cUser && _cUser.role !== 'admin') {
-  const b = document.createElement('div');
-  b.className = 'alert alert-info mb-4';
-  b.innerHTML = '🔒 <strong>Data Master:</strong> Anda hanya dapat melihat data pelanggan. Untuk menambah/mengubah data, hubungi Admin.';
-  document.querySelector('.page-content').prepend(b);
-}
+  const thead = document.getElementById('tableHead');
+  const _cUser = API.getUser();
+  const isRestricted = _cUser && (_cUser.role === 'keuangan' || _cUser.role === 'staff');
 
-  tbody.innerHTML = data.map(c => `<tr>
-    <td><strong>${c.name}</strong></td>
-    <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.address}</td>
-    <td>${c.phone}</td>
-    <td>${c.email || '—'}</td>
-    <td>${c.contact_person || '—'}</td>
-    <td style="font-size:.8rem">${c.npwp || '—'}</td>
-    <td><div class="td-actions" data-perm-master-write>
-      <button class="btn btn-icon btn-sm" onclick="editData('${c.id}')">✏️</button>
-      <button class="btn btn-icon btn-sm" onclick="deleteData('${c.id}')" style="color:var(--danger)">🗑</button>
-    </div></td>
-  </tr>`).join('');
+  if (isRestricted) {
+    thead.innerHTML = '<tr><th>Nama</th><th>Alamat</th><th>Telepon</th><th>Email</th><th>PIC</th><th>NPWP</th></tr>';
+  } else {
+    thead.innerHTML = '<tr><th>Nama</th><th>Alamat</th><th>Telepon</th><th>Email</th><th>PIC</th><th>NPWP</th><th class="action-column">Aksi</th></tr>';
+  }
+
+  if (!data.length) { 
+    const colSpan = isRestricted ? 6 : 7;
+    tbody.innerHTML = `<tr><td colspan="${colSpan}" class="text-center text-secondary" style="padding:2rem">Tidak ada data pelanggan</td></tr>`; 
+    return; 
+  }
+
+  if (_cUser && _cUser.role === 'staff') {
+    const existingAlert = document.querySelector('.alert-info-master');
+    if (!existingAlert) {
+      const b = document.createElement('div');
+      b.className = 'alert alert-info mb-4 alert-info-master';
+      b.innerHTML = '🔒 <strong>Data Master:</strong> Anda hanya dapat melihat data pelanggan. Untuk menambah/mengubah data, hubungi Admin.';
+      document.querySelector('.page-content').prepend(b);
+    }
+  }
+
+  const addNewBtn = document.getElementById('addNewBtn');
+  if (addNewBtn) {
+    if (isRestricted) {
+      addNewBtn.style.setProperty('display', 'none', 'important');
+    } else {
+      addNewBtn.style.setProperty('display', 'block', 'important');
+    }
+  }
+
+  tbody.innerHTML = data.map(c => {
+    let rowHtml = `
+      <tr>
+        <td><strong>${c.name}</strong></td>
+        <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${c.address}">${c.address}</td>
+        <td>${c.phone}</td>
+        <td>${c.email || '—'}</td>
+        <td>${c.contact_person || '—'}</td>
+        <td style="font-size:.8rem">${c.npwp || '—'}</td>
+    `;
+    
+    if (!isRestricted) {
+      rowHtml += `
+        <td class="action-column">
+          <div class="td-actions">
+            <button class="btn btn-icon btn-sm" onclick="editData('${c.id}')">✏️</button>
+            <button class="btn btn-icon btn-sm" onclick="deleteData('${c.id}')" style="color:var(--danger)">🗑</button>
+          </div>
+        </td>
+      `;
+    }
+    
+    rowHtml += '</tr>';
+    return rowHtml;
+  }).join('');
 }
 
 function filterTable() {
@@ -162,7 +203,11 @@ async function deleteData(id) {
   catch(e) { showToast(e.message, 'error'); }
 }
 
-AOS.init();
+AOS.init({
+  duration: 700,
+  easing: 'ease-in-out',
+  once: true
+});
 loadAll();
 </script>
 </body>

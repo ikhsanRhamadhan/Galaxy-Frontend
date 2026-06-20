@@ -7,36 +7,78 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+<style>
+  .loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
 </head>
 <body class="login-body">
+
+<div id="loaderOverlay" class="loader-overlay">
+  <div class="spinner"></div>
+  <p>Memvalidasi & Memuat Data...</p>
+</div>
+
 <div class="login-wrapper">
-  <div class="login-left">
+  <div class="login-left" data-aos="fade-right" data-aos-duration="1000">
     <div class="login-brand">
-      <h1>Galaxy<br><span>MultiTrans</span></h1>
-      <p>Sistem Manajemen Pengiriman & Invoice Otomatis</p>
+      <h1 data-aos="zoom-out" data-aos-delay="300" data-aos-duration="800">Galaxy<br><span>MultiTrans</span></h1>
+      <p data-aos="fade-up" data-aos-delay="600" data-aos-duration="800">Sistem Manajemen Pengiriman & Invoice Otomatis</p>
     </div>
     <div class="login-decoration">
-      <div class="deco-circle c1"></div>
-      <div class="deco-circle c2"></div>
-      <div class="deco-circle c3"></div>
-      <div class="deco-grid"></div>
+      <div class="deco-circle c1" data-aos="zoom-in" data-aos-delay="400"></div>
+      <div class="deco-circle c2" data-aos="zoom-in" data-aos-delay="600"></div>
+      <div class="deco-circle c3" data-aos="zoom-in" data-aos-delay="800"></div>
+      <div class="deco-grid" data-aos="fade" data-aos-delay="500"></div>
     </div>
   </div>
-  <div class="login-right">
-    <div class="login-box">
+  
+  <div class="login-right" data-aos="fade-left" data-aos-duration="1000">
+    <div class="login-box" data-aos="fade-up" data-aos-delay="200" data-aos-duration="800">
       <div class="login-header">
         <h2>Selamat Datang</h2>
         <p>Masuk ke sistem manajemen Anda</p>
       </div>
       <form id="loginForm" class="login-form">
-        <div class="form-group">
+        <div class="form-group" data-aos="fade-up" data-aos-delay="400" data-aos-duration="600">
           <label>Username</label>
           <div class="input-wrap">
             <span class="input-icon">⊙</span>
             <input type="text" id="username" placeholder="Masukkan username" required>
           </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" data-aos="fade-up" data-aos-delay="550" data-aos-duration="600">
           <label>Password</label>
           <div class="input-wrap">
             <span class="input-icon">◈</span>
@@ -45,7 +87,7 @@
           </div>
         </div>
         <div id="loginError" class="alert alert-error" style="display:none"></div>
-        <button type="submit" class="btn-login" id="loginBtn">
+        <button type="submit" class="btn-login" id="loginBtn" data-aos="fade-up" data-aos-delay="700" data-aos-duration="600">
           <span>Masuk</span>
           <span class="btn-arrow">→</span>
         </button>
@@ -53,15 +95,18 @@
     </div>
   </div>
 </div>
+
 <script src="js/api.js"></script>
 <script>
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const btn = document.getElementById('loginBtn');
   const err = document.getElementById('loginError');
+  const loader = document.getElementById('loaderOverlay');
   btn.classList.add('loading');
   btn.disabled = true;
   err.style.display = 'none';
+  loader.style.display = 'flex';
   
   try {
     const res = await API.login(
@@ -74,6 +119,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   } catch(e) {
     err.textContent = e.message || 'Login gagal';
     err.style.display = 'block';
+    loader.style.display = 'none';
   } finally {
     btn.classList.remove('loading');
     btn.disabled = false;
@@ -84,6 +130,11 @@ function togglePw() {
   const pw = document.getElementById('password');
   pw.type = pw.type === 'password' ? 'text' : 'password';
 }
+
+AOS.init({
+  once: true,
+  easing: 'ease-in-out'
+});
 </script>
 </body>
 </html>

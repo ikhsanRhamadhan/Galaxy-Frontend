@@ -145,7 +145,12 @@ async function deleteUser(id, name) {
 }
 
 
-AOS.init();
+AOS.init({
+    duration: 700,
+    easing: 'ease-in-out',
+    once: true
+  });
+  
 loadAll();
 </script>
 </body>

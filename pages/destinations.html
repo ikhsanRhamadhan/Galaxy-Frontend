@@ -7,9 +7,6 @@
 <link rel="stylesheet" href="../css/style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Diplomata&family=Lobster&family=Oswald:wght@500&family=Pliant:ital,wght@0,100..900;1,100..900&family=Six+Caps&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Diplomata&family=Lobster&family=Oswald:wght@500&family=Pliant:ital,wght@0,100..900;1,100..900&family=Six+Caps&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -21,38 +18,37 @@
     <div class="sidebar-logo"><div class="logo-icon"><img src="../image/logo1.png" alt="Logo Galaxy MultiTrans"></div><div class="logo-text"><strong>Galaxy MultiTrans</strong><span>Ekspedisi & Logistik</span></div></div>
     <nav class="sidebar-nav">
       <div class="nav-section"><div class="nav-section-label">Utama</div><a href="dashboard.html" class="nav-item"><span class="nav-icon">◈</span> Dashboard</a></div>
-      <div class="nav-section"><div class="nav-section-label">Transaksi</div><a href="shipments.html" class="nav-item"><span class="nav-icon">📦</span> Pengiriman</a><a href="invoices.html" class="nav-item"><span class="nav-icon">🧾</span> Invoice</a></div>
-      <div class="nav-section"><div class="nav-section-label">Data Master</div>
+      <div class="nav-section"><div class="nav-section-label">Transaksi</div><a href="shipments.html" class="nav-item" data-nav="shipments"><span class="nav-icon">📦</span> Pengiriman</a><a href="invoices.html" class="nav-item" data-nav="invoices"><span class="nav-icon">🧾</span> Invoice</a></div>
+      <div class="nav-section" data-nav="master"><div class="nav-section-label">Data Master</div>
         <a href="customers.html" class="nav-item"><span class="nav-icon">👥</span> Pelanggan</a>
         <a href="destinations.html" class="nav-item active"><span class="nav-icon">📍</span> Tujuan</a>
         <a href="services.html" class="nav-item"><span class="nav-icon">⚙️</span> Layanan & Tarif</a>
       </div>
       <div class="nav-section"><div class="nav-section-label">Laporan</div><a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Laporan</a></div>
-      <div class="nav-section admin-only"><div class="nav-section-label">Administrasi</div><a href="users.html" class="nav-item admin-only"><span class="nav-icon">🔑</span> Manajemen User</a></div>
+      <div class="nav-section admin-only" data-nav="users"><div class="nav-section-label">Administrasi</div><a href="users.html" class="nav-item admin-only"><span class="nav-icon">🔑</span> Manajemen User</a></div>
     </nav>
     <div class="sidebar-user"><div class="user-avatar" id="sidebarUserAvatar">A</div><div class="user-info"><strong id="sidebarUserName">User</strong><span id="sidebarUserRole">role</span></div><button class="btn-logout" onclick="API.logout()">⏻</button></div>
   </aside>
   <div class="main-content">
     <div class="topbar">
       <div class="topbar-title"><h2>Tujuan Pengiriman</h2><p>Kelola data kota tujuan dan tarif zona</p></div>
-      <div class="topbar-actions"><button class="btn btn-primary" onclick="openAdd()" data-perm-master-write>+ Tujuan Baru</button></div>
+      <div class="topbar-actions"><button class="btn btn-primary" onclick="openAdd()" id="addNewBtn">+ Tujuan Baru</button></div>
     </div>
    
-    <div class="page-content">
+    <div class="page-content" data-aos="fade-down">
       <div class="card">
-         <div data-aos="fade-down"
-             data-aos-anchor-placement="center-center">
         <div class="card-header">
           <h3>Daftar Tujuan</h3>
           <div class="search-wrap"><span class="search-icon">🔍</span><input type="text" id="searchInput" placeholder="Cari kota, provinsi..." oninput="filterTable()"></div>
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Kota</th><th>Provinsi</th><th>Zona</th><th>Surcharge (per kg)</th><th>Aksi</th></tr></thead>
+            <thead id="tableHead">
+              <tr><th>Kota</th><th>Provinsi</th><th>Zona</th><th>Surcharge (per kg)</th><th class="action-column">Aksi</th></tr>
+            </thead>
             <tbody id="tableBody"><tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-secondary)">Memuat data...</td></tr></tbody>
           </table>
         </div>
-      </div>
       </div>
     </div>
   </div>
@@ -84,7 +80,7 @@
 
 <script src="../js/api.js"></script>
 <script>
-requireAuth(); initUserInfo();
+requireAuth(); initUserInfo(); applyRoleUI();
 let allData = [];
 
 async function loadAll() {
@@ -96,17 +92,44 @@ const zoneColors = { A: '#38A169', B: '#3182CE', C: '#DD6B20' };
 
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
-  if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-secondary" style="padding:2rem">Tidak ada data tujuan</td></tr>'; return; }
-  tbody.innerHTML = data.map(d => `<tr>
-    <td><strong>${d.city}</strong></td>
-    <td>${d.province}</td>
-    <td><span style="background:${zoneColors[d.zone]}22;color:${zoneColors[d.zone]};padding:.2rem .65rem;border-radius:20px;font-size:.8rem;font-weight:600">Zona ${d.zone}</span></td>
-    <td>${d.surcharge > 0 ? formatRp(d.surcharge) : '—'}</td>
-    <td><div class="td-actions admin-only">
-      <button class="btn btn-icon btn-sm admin-only" onclick="editData('${d.id}')">✏️</button>
-      <button class="btn btn-icon btn-sm admin-only" onclick="deleteData('${d.id}')" style="color:var(--danger)">🗑</button>
-    </div></td>
-  </tr>`).join('');
+  const thead = document.getElementById('tableHead');
+  const _cUser = API.getUser();
+  const isRestricted = _cUser && (_cUser.role === 'keuangan' || _cUser.role === 'staff');
+
+  if (isRestricted) {
+    thead.innerHTML = '<tr><th>Kota</th><th>Provinsi</th><th>Zona</th><th>Surcharge (per kg)</th></tr>';
+  } else {
+    thead.innerHTML = '<tr><th>Kota</th><th>Provinsi</th><th>Zona</th><th>Surcharge (per kg)</th><th class="action-column">Aksi</th></tr>';
+  }
+
+  if (!data.length) { 
+    const colSpan = isRestricted ? 4 : 5;
+    tbody.innerHTML = `<tr><td colspan="${colSpan}" class="text-center text-secondary" style="padding:2rem">Tidak ada data tujuan</td></tr>`; 
+    return; 
+  }
+
+  const addNewBtn = document.getElementById('addNewBtn');
+  if (addNewBtn && isRestricted) {
+    addNewBtn.style.display = 'none';
+  }
+
+  tbody.innerHTML = data.map(d => {
+    let rowHtml = `<tr>
+      <td><strong>${d.city}</strong></td>
+      <td>${d.province}</td>
+      <td><span style="background:${zoneColors[d.zone]}22;color:${zoneColors[d.zone]};padding:.2rem .65rem;border-radius:20px;font-size:.8rem;font-weight:600">Zona ${d.zone}</span></td>
+      <td>${d.surcharge > 0 ? formatRp(d.surcharge) : '—'}</td>`;
+    
+    if (!isRestricted) {
+      rowHtml += `<td class="action-column"><div class="td-actions">
+        <button class="btn btn-icon btn-sm" onclick="editData('${d.id}')">✏️</button>
+        <button class="btn btn-icon btn-sm" onclick="deleteData('${d.id}')" style="color:var(--danger)">🗑</button>
+      </div></td>`;
+    }
+    
+    rowHtml += '</tr>';
+    return rowHtml;
+  }).join('');
 }
 
 function filterTable() {
@@ -156,8 +179,11 @@ async function deleteData(id) {
   catch(e) { showToast(e.message, 'error'); }
 }
 
-AOS.init();
-
+AOS.init({
+  duration: 700,
+  easing: 'ease-in-out',
+  once: true
+});
 loadAll();
 </script>
 </body>

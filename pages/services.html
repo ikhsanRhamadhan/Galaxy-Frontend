@@ -18,31 +18,32 @@
     <div class="sidebar-logo"><div class="logo-icon"><img src="../image/logo1.png" alt="Logo Galaxy MultiTrans"></div><div class="logo-text"><strong>Galaxy MultiTrans</strong><span>Ekspedisi & Logistik</span></div></div>
     <nav class="sidebar-nav">
       <div class="nav-section"><div class="nav-section-label">Utama</div><a href="dashboard.html" class="nav-item"><span class="nav-icon">◈</span> Dashboard</a></div>
-      <div class="nav-section"><div class="nav-section-label">Transaksi</div><a href="shipments.html" class="nav-item"><span class="nav-icon">📦</span> Pengiriman</a><a href="invoices.html" class="nav-item"><span class="nav-icon">🧾</span> Invoice</a></div>
-      <div class="nav-section"><div class="nav-section-label">Data Master</div>
+      <div class="nav-section"><div class="nav-section-label">Transaksi</div><a href="shipments.html" class="nav-item" data-nav="shipments"><span class="nav-icon">📦</span> Pengiriman</a><a href="invoices.html" class="nav-item" data-nav="invoices"><span class="nav-icon">🧾</span> Invoice</a></div>
+      <div class="nav-section" data-nav="master"><div class="nav-section-label">Data Master</div>
         <a href="customers.html" class="nav-item"><span class="nav-icon">👥</span> Pelanggan</a>
         <a href="destinations.html" class="nav-item"><span class="nav-icon">📍</span> Tujuan</a>
         <a href="services.html" class="nav-item active"><span class="nav-icon">⚙️</span> Layanan & Tarif</a>
       </div>
       <div class="nav-section"><div class="nav-section-label">Laporan</div><a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Laporan</a></div>
-      <div class="nav-section admin-only"><div class="nav-section-label">Administrasi</div><a href="users.html" class="nav-item admin-only"><span class="nav-icon">🔑</span> Manajemen User</a></div>
+      <div class="nav-section admin-only" data-nav="users"><div class="nav-section-label">Administrasi</div><a href="users.html" class="nav-item admin-only"><span class="nav-icon">🔑</span> Manajemen User</a></div>
     </nav>
     <div class="sidebar-user"><div class="user-avatar" id="sidebarUserAvatar">A</div><div class="user-info"><strong id="sidebarUserName">User</strong><span id="sidebarUserRole">role</span></div><button class="btn-logout" onclick="API.logout()">⏻</button></div>
   </aside>
   <div class="main-content">
     <div class="topbar">
       <div class="topbar-title"><h2>Layanan & Tarif</h2><p>Konfigurasi jenis layanan dan harga per kg</p></div>
-      <div class="topbar-actions"><button class="btn btn-primary" onclick="openAdd()" data-perm-master-write>+ Layanan Baru</button></div>
+      <div class="topbar-actions"><button class="btn btn-primary" onclick="openAdd()" id="addNewBtn">+ Layanan Baru</button></div>
     </div>
-    <div data-aos="fade-down"
-        data-aos-duration="3001">
-    <div class="page-content">
+    
+    <div class="page-content" data-aos="fade-down">
       <div id="serviceCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin-bottom:1.5rem"></div>
-      <d class="card">
+      <div class="card">
         <div class="card-header"><h3>Semua Layanan</h3></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Kode</th><th>Nama Layanan</th><th>Deskripsi</th><th>Harga/kg</th><th>Min. Berat</th><th>Aksi</th></tr></thead>
+            <thead id="tableHead">
+              <tr><th>Kode</th><th>Nama Layanan</th><th>Deskripsi</th><th>Harga/kg</th><th>Min. Berat</th><th class="action-column">Aksi</th></tr>
+            </thead>
             <tbody id="tableBody"></tbody>
           </table>
         </div>
@@ -76,7 +77,7 @@
 
 <script src="../js/api.js"></script>
 <script>
-requireAuth(); initUserInfo();
+requireAuth(); initUserInfo(); applyRoleUI();
 let allData = [];
 const svcIcons = { REG: '📦', EXP: '⚡', CGO: '🚚' };
 const svcColors = { REG: '#3182CE', EXP: '#E53E3E', CGO: '#DD6B20' };
@@ -105,18 +106,45 @@ function renderCards() {
 
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
-  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-secondary" style="padding:2rem">Tidak ada layanan</td></tr>'; return; }
-  tbody.innerHTML = data.map(s => `<tr>
-    <td><span class="tag">${s.code}</span></td>
-    <td><strong>${s.name}</strong></td>
-    <td style="color:var(--text-secondary)">${s.description||'—'}</td>
-    <td style="font-weight:600;color:var(--primary)">${formatRp(s.price_per_kg)}</td>
-    <td>${s.min_weight} kg</td>
-    <td><div class="td-actions admin-only">
-      <button class="btn btn-icon btn-sm admin-only" onclick="editData('${s.id}')">✏️</button>
-      <button class="btn btn-icon btn-sm admin-only" onclick="deleteData('${s.id}')" style="color:var(--danger)">🗑</button>
-    </div></td>
-  </tr>`).join('');
+  const thead = document.getElementById('tableHead');
+  const _cUser = API.getUser();
+  const isRestricted = _cUser && (_cUser.role === 'keuangan' || _cUser.role === 'staff');
+
+  if (isRestricted) {
+    thead.innerHTML = '<tr><th>Kode</th><th>Nama Layanan</th><th>Deskripsi</th><th>Harga/kg</th><th>Min. Berat</th></tr>';
+  } else {
+    thead.innerHTML = '<tr><th>Kode</th><th>Nama Layanan</th><th>Deskripsi</th><th>Harga/kg</th><th>Min. Berat</th><th class="action-column">Aksi</th></tr>';
+  }
+
+  if (!data.length) { 
+    const colSpan = isRestricted ? 5 : 6;
+    tbody.innerHTML = `<tr><td colspan="${colSpan}" class="text-center text-secondary" style="padding:2rem">Tidak ada layanan</td></tr>`; 
+    return; 
+  }
+
+  const addNewBtn = document.getElementById('addNewBtn');
+  if (addNewBtn && isRestricted) {
+    addNewBtn.style.display = 'none';
+  }
+
+  tbody.innerHTML = data.map(s => {
+    let rowHtml = `<tr>
+      <td><span class="tag">${s.code}</span></td>
+      <td><strong>${s.name}</strong></td>
+      <td style="color:var(--text-secondary)">${s.description||'—'}</td>
+      <td style="font-weight:600;color:var(--primary)">${formatRp(s.price_per_kg)}</td>
+      <td>${s.min_weight} kg</td>`;
+    
+    if (!isRestricted) {
+      rowHtml += `<td class="action-column"><div class="td-actions">
+        <button class="btn btn-icon btn-sm" onclick="editData('${s.id}')">✏️</button>
+        <button class="btn btn-icon btn-sm" onclick="deleteData('${s.id}')" style="color:var(--danger)">🗑</button>
+      </div></td>`;
+    }
+    
+    rowHtml += '</tr>';
+    return rowHtml;
+  }).join('');
 }
 
 function openAdd() {
@@ -160,8 +188,11 @@ async function deleteData(id) {
   catch(e) { showToast(e.message, 'error'); }
 }
 
-
-AOS.init();
+AOS.init({
+  duration: 700,
+  easing: 'ease-in-out',
+  once: true
+});
 loadAll();
 </script>
 </body>

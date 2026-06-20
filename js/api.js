@@ -1,4 +1,5 @@
 const API_BASE = 'http://localhost:8000/api';
+// const API_BASE = 'https://6rz9bsm8-8000.asse.devtunnels.ms/api';
 
 const API = {
   getToken() { return localStorage.getItem('token'); },
@@ -111,7 +112,23 @@ function applyRoleUI() {
   const user = API.getUser();
   if (!user) return;
 
-  // Sembunyikan elemen berdasarkan permission
+  if (user.role === 'staff') {
+    document.querySelectorAll('[data-nav="invoices"]').forEach(el => { if (el) el.style.display = 'none'; });
+    document.querySelectorAll('[data-nav="report-finance"]').forEach(el => { if (el) el.style.display = 'none'; });
+    document.querySelectorAll('[data-nav="users"]').forEach(el => { if (el) el.style.display = 'none'; });
+  }
+  
+  if (user.role === 'keuangan') {
+    document.querySelectorAll('[data-nav="users"]').forEach(el => { if (el) el.style.display = 'none'; });
+    document.querySelectorAll('[data-nav="report-shipments"]').forEach(el => { if (el) el.style.display = 'none'; });
+  }
+
+  if (user.role !== 'admin') {
+    document.querySelectorAll('.admin-only').forEach(el => { if (el) el.style.display = 'none'; });
+  }
+
+  const isRestrictedMaster = (user.role === 'keuangan' || user.role === 'staff');
+
   const permMap = {
     'data-perm-shipment-create': 'shipment.create',
     'data-perm-shipment-update': 'shipment.update',
@@ -119,36 +136,23 @@ function applyRoleUI() {
     'data-perm-invoice-view':    'invoice.view',
     'data-perm-invoice-create':  'invoice.create',
     'data-perm-invoice-delete':  'invoice.delete',
-    'data-perm-master-write':    'master.create',
+    'data-perm-master-write':    'master.manage',
     'data-perm-report-finance':  'report.finance',
     'data-perm-user-manage':     'user.manage',
   };
 
   Object.entries(permMap).forEach(([attr, perm]) => {
     document.querySelectorAll(`[${attr}]`).forEach(el => {
-      if (!can(perm)) el.style.display = 'none';
+      if (attr === 'data-perm-master-write' && isRestrictedMaster) {
+        el.style.display = 'none';
+      } 
+      else if (!can(perm)) {
+        el.style.display = 'none';
+      }
     });
   });
 
-  // Legacy class-based (backward compat)
-  if (user.role !== 'admin') {
-    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-  }
-  if (!can('invoice.view')) {
-    document.querySelectorAll('.finance-only').forEach(el => el.style.display = 'none');
-  }
-
-  // Sidebar: sembunyikan menu invoice untuk staff
-  if (user.role === 'staff') {
-    document.querySelectorAll('[data-nav="invoices"]').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('[data-nav="users"]').forEach(el => el.style.display = 'none');
-  }
-  if (user.role === 'keuangan') {
-    document.querySelectorAll('[data-nav="users"]').forEach(el => el.style.display = 'none');
-  }
-
-  // Tampilkan role badge di sidebar
-  const roleInfo = ROLES[user.role] || ROLES.staff;
+  const roleInfo = ROLES[user.role] || { label: 'Staff', color: '#2C5282', bg: '#BEE3F8' };
   const roleEl = document.getElementById('sidebarUserRole');
   if (roleEl) {
     roleEl.innerHTML = `<span style="background:${roleInfo.bg};color:${roleInfo.color};padding:.1rem .4rem;border-radius:4px;font-size:.7rem;font-weight:700">${roleInfo.label}</span>`;
@@ -212,3 +216,72 @@ document.addEventListener('click', e => {
 });
 
 function confirmAction(msg) { return confirm(msg); }
+
+const stylePageLoader = document.createElement('style');
+stylePageLoader.innerHTML = `
+  #top-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background-color: #0056b3;
+    z-index: 99999;
+    transition: width 0.4s ease, opacity 0.4s ease;
+    box-shadow: 0 0 10px rgba(0, 86, 179, 0.7);
+  }
+  .page-dimmed {
+    opacity: 0.6 !important;
+    transition: opacity 0.4s ease;
+  }
+`;
+document.head.appendChild(stylePageLoader);
+
+const progressBar = document.createElement('div');
+progressBar.id = 'top-progress-bar';
+document.body.appendChild(progressBar);
+
+function startPageLoading() {
+  const content = document.querySelector('.main-content') || document.body;
+  if (content) content.classList.add('page-dimmed');
+  
+  progressBar.style.opacity = '1';
+  progressBar.style.width = '0%';
+  
+  setTimeout(() => { progressBar.style.width = '30%'; }, 50);
+  setTimeout(() => { progressBar.style.width = '70%'; }, 200);
+}
+
+function stopPageLoading() {
+  progressBar.style.width = '100%';
+  setTimeout(() => {
+    progressBar.style.opacity = '0';
+    const content = document.querySelector('.main-content') || document.body;
+    if (content) content.classList.remove('page-dimmed');
+    setTimeout(() => { progressBar.style.width = '0%'; }, 400);
+  }, 200);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  startPageLoading();
+  setTimeout(stopPageLoading, 600);
+});
+
+window.addEventListener('beforeunload', () => {
+  startPageLoading();
+});
+
+const originalFetch = window.fetch;
+if (originalFetch) {
+  window.fetch = async function (...args) {
+    startPageLoading();
+    try {
+      const response = await originalFetch(...args);
+      return response;
+    } finally {
+      stopPageLoading();
+    }
+  };
+}
+
+
