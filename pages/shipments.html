@@ -1,105 +1,339 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Pengiriman — PT Galaxy MultiTrans</title>
 <link rel="stylesheet" href="../css/style.css">
+<link rel="icon" type="image/png" href="../image/logo1.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Diplomata&family=Lobster&family=Oswald:wght@500&family=Pliant:ital,wght@0,100..900;1,100..900&family=Six+Caps&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+<style>
+/* ===== SHIPMENT PAGE — MOBILE OVERRIDES ===== */
+
+/* Form 2 kolom di dalam modal jadi 1 kolom di mobile */
+@media (max-width: 640px) {
+  .shipment-form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+  .shipment-detail-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem !important;
+  }
+  .shipment-detail-grid .weight-col {
+    grid-column: 1 / -1;
+  }
+
+  /* Topbar: sembunyikan teks "Pengiriman Baru", tampilkan ikon + */
+  .btn-new-text { display: none; }
+  .btn-new-icon { display: inline; }
+
+  /* Tabel: tampilkan versi card di mobile */
+  .table-wrap table { display: none; }
+  .mobile-list { display: block; }
+
+  /* Modal full screen di mobile */
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .modal {
+    border-radius: 16px 16px 0 0 !important;
+    max-height: 92vh;
+  }
+}
+
+@media (min-width: 641px) {
+  .btn-new-icon { display: none; }
+  .mobile-list { display: none; }
+}
+
+/* Card list item untuk mobile */
+.mobile-list { margin-top: 0.25rem; }
+.ship-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.ship-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.ship-card-resi {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--primary);
+  background: var(--surface2);
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+.ship-card-route {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+.ship-card-route-arrow {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+.ship-card-person strong {
+  display: block;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+.ship-card-person span {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+.ship-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.ship-card-cost {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.95rem;
+  margin-left: auto;
+}
+.ship-card-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.ship-card-actions .btn {
+  flex: 1;
+  justify-content: center;
+  font-size: 0.8rem;
+  padding: 0.45rem 0.5rem;
+}
+</style>
 </head>
 <body>
 <div class="app-layout">
-  <aside class="sidebar">
-    <div class="sidebar-logo"><div class="logo-icon"><img src="../image/logo1.png" alt="Logo Galaxy MultiTrans"></div><div class="logo-text"><strong>Galaxy MultiTrans</strong><span>Ekspedisi & Logistik</span></div></div>
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon"><img src="../image/logo1.png" alt="Logo Galaxy MultiTrans"></div>
+      <div class="logo-text">
+        <strong>Galaxy MultiTrans</strong>
+        <span>Ekspedisi & Logistik</span>
+      </div>
+      <!-- Tombol close sidebar (mobile) -->
+      <button class="sidebar-close" onclick="closeSidebar()" aria-label="Tutup menu">✕</button>
+    </div>
     <nav class="sidebar-nav">
-      <div class="nav-section"><div class="nav-section-label">Utama</div><a href="dashboard.html" class="nav-item"><span class="nav-icon">◈</span> Dashboard</a></div>
-      <div class="nav-section"><div class="nav-section-label">Transaksi</div>
-        <a href="shipments.html" class="nav-item active"><span class="nav-icon">📦</span> Pengiriman</a>
-        <a href="invoices.html" class="nav-item" data-nav="invoices"><span class="nav-icon">🧾</span> Invoice</a>
+      <div class="nav-section">
+        <div class="nav-section-label">Utama</div>
+        <a href="dashboard.html" class="nav-item" onclick="closeSidebar()"><span class="nav-icon">◈</span> Dashboard</a>
       </div>
-      <div class="nav-section"><div class="nav-section-label">Data Master</div>
-        <a href="customers.html" class="nav-item"><span class="nav-icon">👥</span> Pelanggan</a>
-        <a href="destinations.html" class="nav-item"><span class="nav-icon">📍</span> Tujuan</a>
-        <a href="services.html" class="nav-item"><span class="nav-icon">⚙️</span> Layanan & Tarif</a>
+      <div class="nav-section">
+        <div class="nav-section-label">Transaksi</div>
+        <a href="shipments.html" class="nav-item active" onclick="closeSidebar()"><span class="nav-icon">📦</span> Pengiriman</a>
+        <a href="invoices.html" class="nav-item" onclick="closeSidebar()"><span class="nav-icon">🧾</span> Invoice</a>
       </div>
-      <div class="nav-section"><div class="nav-section-label">Laporan</div><a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Laporan</a></div>
-      <div class="nav-section"><div class="nav-section-label admin-only">Administrasi</div>
-        <a href="users.html" class="nav-item admin-only" data-nav="users"><span class="nav-icon">🔑</span> Manajemen User</a>
+      <div class="nav-section">
+        <div class="nav-section-label">Data Master</div>
+        <a href="customers.html" class="nav-item" onclick="closeSidebar()"><span class="nav-icon">👥</span> Pelanggan</a>
+        <a href="destinations.html" class="nav-item" onclick="closeSidebar()"><span class="nav-icon">📍</span> Tujuan</a>
+        <a href="services.html" class="nav-item" onclick="closeSidebar()"><span class="nav-icon">⚙️</span> Layanan & Tarif</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Laporan</div>
+        <a href="reports.html" class="nav-item" onclick="closeSidebar()"><span class="nav-icon">📊</span> Laporan</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label admin-only">Administrasi</div>
+        <a href="users.html" class="nav-item admin-only" onclick="closeSidebar()"><span class="nav-icon">🔑</span> Manajemen User</a>
       </div>
     </nav>
-    <div class="sidebar-user"><div class="user-avatar" id="sidebarUserAvatar">A</div><div class="user-info"><strong id="sidebarUserName">User</strong><span id="sidebarUserRole"></span></div><button class="btn-logout" onclick="API.logout()">⏻</button></div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebarUserAvatar">A</div>
+      <div class="user-info">
+        <strong id="sidebarUserName">User</strong>
+        <span id="sidebarUserRole"></span>
+      </div>
+      <button class="btn-logout" onclick="API.logout()" aria-label="Logout">⏻</button>
+    </div>
   </aside>
+
+  <!-- Overlay backdrop -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- ===== MAIN CONTENT ===== -->
   <div class="main-content">
     <div class="topbar">
-      <div class="topbar-title"><h2>Data Pengiriman</h2><p>Kelola semua transaksi pengiriman</p></div>
+      <button class="menu-toggle" onclick="openSidebar()" aria-label="Buka menu">☰</button>
+      <div class="topbar-title">
+        <h2>Data Pengiriman</h2>
+        <p>Kelola semua transaksi pengiriman</p>
+      </div>
       <div class="topbar-actions">
-        <!-- Hanya admin & staff -->
-        <button class="btn btn-primary" onclick="openModal('modalShipment')" data-perm-shipment-create>+ Pengiriman Baru</button>
+        <!-- Desktop: teks penuh | Mobile: ikon + saja -->
+        <button class="btn btn-primary" onclick="openModal('modalShipment')" data-perm-shipment-create>
+          <span class="btn-new-text">+ Pengiriman Baru</span>
+          <span class="btn-new-icon">+</span>
+        </button>
       </div>
     </div>
+
     <div class="page-content">
-      <!-- Role info banner -->
-      <div data-aos="fade-down"
-         data-aos-anchor-placement="center-center">
-      <div id="roleBanner" class="alert alert-info mb-4" style="display:none"></div>
-      <div class="card">
-        <div class="card-header">
-          <h3>Daftar Pengiriman</h3>
-          <div class="toolbar" style="margin:0">
-            <div class="search-wrap"><span class="search-icon">🔍</span><input type="text" id="searchInput" placeholder="Cari resi, nama..." oninput="filterTable()"></div>
-            <select class="filter-select" id="filterStatus" onchange="filterTable()">
-              <option value="">Semua Status</option>
-              <option value="pending">Pending</option>
-              <option value="dikirim">Dikirim</option>
-              <option value="selesai">Selesai</option>
-            </select>
+      <div data-aos="fade-down" data-aos-anchor-placement="center-center">
+
+        <!-- Banner role -->
+        <div id="roleBanner" class="alert alert-info mb-4" style="display:none"></div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>Daftar Pengiriman</h3>
+            <div class="toolbar" style="margin:0">
+              <div class="search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Cari resi, nama..." oninput="filterTable()">
+              </div>
+              <select class="filter-select" id="filterStatus" onchange="filterTable()">
+                <option value="">Semua Status</option>
+                <option value="pending">Pending</option>
+                <option value="dikirim">Dikirim</option>
+                <option value="selesai">Selesai</option>
+              </select>
+            </div>
           </div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>No. Resi</th><th>Pengirim</th><th>Penerima</th><th>Tujuan</th><th>Layanan</th><th>Berat</th><th>Biaya</th><th>Status</th><th>Aksi</th></tr></thead>
-            <tbody id="tableBody"><tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--text-secondary)">Memuat data...</td></tr></tbody>
-          </table>
+
+          <!-- Tabel: desktop -->
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>No. Resi</th>
+                  <th>Pengirim</th>
+                  <th>Penerima</th>
+                  <th>Tujuan</th>
+                  <th>Layanan</th>
+                  <th>Berat</th>
+                  <th>Biaya</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+                <tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--text-secondary)">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Card list: mobile -->
+          <div class="mobile-list" id="mobileList">
+            <div style="text-align:center;padding:2rem;color:var(--text-secondary)">Memuat data...</div>
+          </div>
+
         </div>
       </div>
     </div>
   </div>
 </div>
-</div>
 
-<!-- Modal Tambah (admin & staff only) -->
+<!-- ===== MODAL: Pengiriman Baru ===== -->
 <div class="modal-overlay" id="modalShipment">
   <div class="modal modal-lg">
-    <div class="modal-header"><h3>Pengiriman Baru</h3><button class="modal-close" onclick="closeModal('modalShipment')">✕</button></div>
+    <div class="modal-header">
+      <h3>Pengiriman Baru</h3>
+      <button class="modal-close" onclick="closeModal('modalShipment')">✕</button>
+    </div>
     <div class="modal-body">
       <div id="formAlert"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+
+      <!-- Pengirim & Penerima: 2 kolom desktop, 1 kolom mobile -->
+      <div class="shipment-form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+
+        <!-- Pengirim -->
         <div>
           <h4 style="font-family:var(--font-display);font-size:.9rem;margin-bottom:1rem;color:var(--primary);text-transform:uppercase;letter-spacing:.04em">📤 Data Pengirim</h4>
-          <div class="form-group"><label class="form-label">Nama Pengirim <span>*</span></label><input class="form-control" id="senderName" placeholder="Nama lengkap pengirim"></div>
-          <div class="form-group"><label class="form-label">Alamat Pengirim <span>*</span></label><textarea class="form-control" id="senderAddress" rows="2" placeholder="Alamat lengkap"></textarea></div>
-          <div class="form-group"><label class="form-label">Telepon Pengirim</label><input class="form-control" id="senderPhone" placeholder="08xx-xxxx-xxxx"></div>
-          <div class="form-group"><label class="form-label">Pelanggan (opsional)</label><select class="form-control" id="customerId"><option value="">— Pilih Pelanggan —</option></select></div>
+          <div class="form-group">
+            <label class="form-label">Nama Pengirim <span style="color:var(--danger)">*</span></label>
+            <input class="form-control" id="senderName" placeholder="Nama lengkap pengirim">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Alamat Pengirim <span style="color:var(--danger)">*</span></label>
+            <textarea class="form-control" id="senderAddress" rows="2" placeholder="Alamat lengkap"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Telepon Pengirim</label>
+            <input class="form-control" id="senderPhone" placeholder="08xx-xxxx-xxxx" type="tel">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pelanggan (opsional)</label>
+            <select class="form-control" id="customerId"><option value="">— Pilih Pelanggan —</option></select>
+          </div>
         </div>
+
+        <!-- Penerima -->
         <div>
           <h4 style="font-family:var(--font-display);font-size:.9rem;margin-bottom:1rem;color:var(--primary);text-transform:uppercase;letter-spacing:.04em">📥 Data Penerima</h4>
-          <div class="form-group"><label class="form-label">Nama Penerima <span>*</span></label><input class="form-control" id="receiverName" placeholder="Nama lengkap penerima"></div>
-          <div class="form-group"><label class="form-label">Alamat Penerima <span>*</span></label><textarea class="form-control" id="receiverAddress" rows="2" placeholder="Alamat lengkap"></textarea></div>
-          <div class="form-group"><label class="form-label">Telepon Penerima</label><input class="form-control" id="receiverPhone" placeholder="08xx-xxxx-xxxx"></div>
+          <div class="form-group">
+            <label class="form-label">Nama Penerima <span style="color:var(--danger)">*</span></label>
+            <input class="form-control" id="receiverName" placeholder="Nama lengkap penerima">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Alamat Penerima <span style="color:var(--danger)">*</span></label>
+            <textarea class="form-control" id="receiverAddress" rows="2" placeholder="Alamat lengkap"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Telepon Penerima</label>
+            <input class="form-control" id="receiverPhone" placeholder="08xx-xxxx-xxxx" type="tel">
+          </div>
         </div>
       </div>
+
       <hr class="section-divider">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
-        <div class="form-group"><label class="form-label">Tujuan <span>*</span></label><select class="form-control" id="destinationId" onchange="calcCost()"><option value="">— Pilih Tujuan —</option></select></div>
-        <div class="form-group"><label class="form-label">Layanan <span>*</span></label><select class="form-control" id="serviceId" onchange="calcCost()"><option value="">— Pilih Layanan —</option></select></div>
-        <div class="form-group"><label class="form-label">Berat (kg) <span>*</span></label><input class="form-control" id="weight" type="number" min="0.1" step="0.1" placeholder="0.0" oninput="calcCost()"></div>
+
+      <!-- Tujuan, Layanan, Berat: 3 kolom desktop → 2+1 mobile -->
+      <div class="shipment-detail-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
+        <div class="form-group">
+          <label class="form-label">Tujuan <span style="color:var(--danger)">*</span></label>
+          <select class="form-control" id="destinationId" onchange="calcCost()"><option value="">— Pilih Tujuan —</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Layanan <span style="color:var(--danger)">*</span></label>
+          <select class="form-control" id="serviceId" onchange="calcCost()"><option value="">— Pilih Layanan —</option></select>
+        </div>
+        <div class="form-group weight-col">
+          <label class="form-label">Berat (kg) <span style="color:var(--danger)">*</span></label>
+          <input class="form-control" id="weight" type="number" min="0.1" step="0.1" placeholder="0.0" oninput="calcCost()">
+        </div>
       </div>
-      <div class="form-group"><label class="form-label">Deskripsi Barang</label><input class="form-control" id="description" placeholder="Contoh: Elektronik, Pakaian, Dokumen"></div>
-      <div class="form-group"><label class="form-label">Catatan</label><input class="form-control" id="notes" placeholder="Catatan tambahan (opsional)"></div>
+
+      <div class="form-group">
+        <label class="form-label">Deskripsi Barang</label>
+        <input class="form-control" id="description" placeholder="Contoh: Elektronik, Pakaian, Dokumen">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catatan</label>
+        <input class="form-control" id="notes" placeholder="Catatan tambahan (opsional)">
+      </div>
+
       <div class="cost-display" id="costDisplay" style="display:none">
         <div><label>Estimasi Biaya</label><br><small id="costBreakdown" style="opacity:.7"></small></div>
         <strong id="costAmount">Rp 0</strong>
@@ -112,21 +346,31 @@
   </div>
 </div>
 
-<!-- Modal Update Status (admin & staff only) -->
+<!-- ===== MODAL: Update Status ===== -->
 <div class="modal-overlay" id="modalStatus">
   <div class="modal modal-sm">
-    <div class="modal-header"><h3>Update Status</h3><button class="modal-close" onclick="closeModal('modalStatus')">✕</button></div>
+    <div class="modal-header">
+      <h3>Update Status</h3>
+      <button class="modal-close" onclick="closeModal('modalStatus')">✕</button>
+    </div>
     <div class="modal-body">
       <input type="hidden" id="statusEditId">
-      <div class="form-group"><label class="form-label">Resi</label><input class="form-control" id="statusResi" disabled></div>
-      <div class="form-group"><label class="form-label">Status Baru</label>
+      <div class="form-group">
+        <label class="form-label">Resi</label>
+        <input class="form-control" id="statusResi" disabled>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status Baru</label>
         <select class="form-control" id="newStatus">
           <option value="pending">Pending</option>
           <option value="dikirim">Dikirim</option>
           <option value="selesai">Selesai</option>
         </select>
       </div>
-      <div class="form-group"><label class="form-label">Catatan</label><input class="form-control" id="statusNotes" placeholder="Keterangan update status"></div>
+      <div class="form-group">
+        <label class="form-label">Catatan</label>
+        <input class="form-control" id="statusNotes" placeholder="Keterangan update status">
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalStatus')">Batal</button>
@@ -137,69 +381,168 @@
 
 <script src="../js/api.js"></script>
 <script>
-requireAuth(); initUserInfo();
-const user = API.getUser();
+/* ===== SIDEBAR TOGGLE ===== */
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+// Tutup sidebar saat resize ke desktop
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 768) closeSidebar();
+});
+
+/* ===== INIT ===== */
+document.addEventListener("DOMContentLoaded", () => {
+  try {
+    if (typeof requireAuth === "function") requireAuth();
+    if (typeof initUserInfo === "function") initUserInfo();
+  } catch (err) {
+    console.error("Gagal menjalankan fungsi auth awal:", err);
+  }
+  showRoleBanner();
+  loadAll();
+});
+
+const user = (typeof API !== "undefined" && API.getUser) ? API.getUser() : { role: 'guest' };
 let allShipments = [], services = [], destinations = [], customers = [];
 
-// Tampilkan banner sesuai role
+/* ===== ROLE BANNER ===== */
 function showRoleBanner() {
   const banner = document.getElementById('roleBanner');
+  if (!banner || !user) return;
   if (user.role === 'keuangan') {
     banner.style.display = 'block';
-    banner.innerHTML = '🔒 <strong>Mode Keuangan:</strong> Anda hanya dapat melihat data pengiriman. Untuk membuat/mengubah status, hubungi Staff atau Admin.';
+    banner.innerHTML = '🔒 <strong>Mode Keuangan:</strong> Anda hanya dapat melihat data pengiriman.';
     banner.className = 'alert alert-warning mb-4';
   } else if (user.role === 'staff') {
     banner.style.display = 'block';
-    banner.innerHTML = '📦 <strong>Mode Staff:</strong> Anda dapat membuat pengiriman dan mengubah status. Untuk invoice dan laporan keuangan, hubungi Keuangan.';
+    banner.innerHTML = '📦 <strong>Mode Staff:</strong> Anda dapat membuat pengiriman dan mengubah status.';
   }
 }
 
+/* ===== LOAD DATA ===== */
 async function loadAll() {
   try {
+    if (typeof API === "undefined") throw new Error("Koneksi ke api.js gagal.");
     [allShipments, services, destinations, customers] = await Promise.all([
       API.getShipments(), API.getServices(), API.getDestinations(), API.getCustomers()
     ]);
     populateSelects();
     renderTable(allShipments);
-  } catch(e) { showToast(e.message, 'error'); }
+  } catch(e) {
+    console.error(e);
+    if (typeof showToast === "function") showToast(e.message, 'error');
+  }
 }
 
+/* ===== POPULATE SELECTS ===== */
 function populateSelects() {
-  document.getElementById('destinationId').innerHTML = '<option value="">— Pilih Tujuan —</option>' + destinations.map(d => `<option value="${d.id}">${d.city}, ${d.province}</option>`).join('');
-  document.getElementById('serviceId').innerHTML = '<option value="">— Pilih Layanan —</option>' + services.map(s => `<option value="${s.id}">${s.name} (${formatRp(s.price_per_kg)}/kg)</option>`).join('');
-  document.getElementById('customerId').innerHTML = '<option value="">— Pilih Pelanggan —</option>' + customers.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  const destEl = document.getElementById('destinationId');
+  const svcEl  = document.getElementById('serviceId');
+  const custEl = document.getElementById('customerId');
+  if (destEl) destEl.innerHTML = '<option value="">— Pilih Tujuan —</option>' + destinations.map(d => `<option value="${d.id}">${d.city}, ${d.province}</option>`).join('');
+  if (svcEl)  svcEl.innerHTML  = '<option value="">— Pilih Layanan —</option>' + services.map(s => `<option value="${s.id}">${s.name} (${fmt(s.price_per_kg)}/kg)</option>`).join('');
+  if (custEl) custEl.innerHTML  = '<option value="">— Pilih Pelanggan —</option>' + customers.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
 }
 
+const fmt = (n) => typeof formatRp === "function" ? formatRp(n) : 'Rp ' + Number(n).toLocaleString('id-ID');
+
+/* ===== RENDER TABLE (Desktop) ===== */
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
-  const canCreate = can('shipment.create');
-  const canUpdate = can('shipment.update');
-  const canDelete = can('shipment.delete');
-  const canInvoice = can('invoice.create');
+  if (!tbody) return;
 
-  if (!data.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center text-secondary" style="padding:2rem">Tidak ada data pengiriman</td></tr>'; return; }
+  const canUpdate  = typeof can === "function" ? can('shipment.update') : false;
+  const canDelete  = typeof can === "function" ? can('shipment.delete') : false;
+  const canInvoice = typeof can === "function" ? can('invoice.create')  : false;
+
+  if (!data || !data.length) {
+    const empty = '<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--text-secondary)">Tidak ada data pengiriman</td></tr>';
+    tbody.innerHTML = empty;
+    document.getElementById('mobileList').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-secondary)">Tidak ada data pengiriman</div>';
+    return;
+  }
+
+  // Desktop table rows
   tbody.innerHTML = data.map(s => `<tr>
     <td><span class="tag">${s.resi_number}</span></td>
-    <td><div style="font-weight:500">${s.sender_name}</div><div style="font-size:.78rem;color:var(--text-secondary)">${s.sender_phone||''}</div></td>
-    <td><div style="font-weight:500">${s.receiver_name}</div><div style="font-size:.78rem;color:var(--text-secondary)">${s.receiver_phone||''}</div></td>
+    <td>
+      <div style="font-weight:500">${s.sender_name}</div>
+      <div style="font-size:.78rem;color:var(--text-secondary)">${s.sender_phone||''}</div>
+    </td>
+    <td>
+      <div style="font-weight:500">${s.receiver_name}</div>
+      <div style="font-size:.78rem;color:var(--text-secondary)">${s.receiver_phone||''}</div>
+    </td>
     <td>${s.destination_detail?.city||'—'}</td>
     <td><span class="badge badge-dikirim">${s.service_detail?.name||'—'}</span></td>
     <td>${s.weight} kg</td>
-    <td style="font-weight:600">${formatRp(s.total_cost)}</td>
+    <td style="font-weight:600">${fmt(s.total_cost)}</td>
     <td><span class="badge badge-${s.status}">${s.status}</span></td>
     <td>
       <div class="td-actions">
-        ${canUpdate ? `<button class="btn btn-icon btn-sm" onclick="updateStatus('${s.id}','${s.resi_number}','${s.status}')" title="Update Status">📋</button>` : ''}
+        ${canUpdate  ? `<button class="btn btn-icon btn-sm" onclick="updateStatus('${s.id}','${s.resi_number}','${s.status}')" title="Update Status">📋</button>` : ''}
         ${canInvoice ? `<button class="btn btn-icon btn-sm" onclick="goInvoice('${s.id}')" title="Buat Invoice">🧾</button>` : ''}
-        ${canDelete ? `<button class="btn btn-icon btn-sm" onclick="deleteShipment('${s.id}')" title="Hapus" style="color:var(--danger)">🗑</button>` : ''}
+        ${canDelete  ? `<button class="btn btn-icon btn-sm" onclick="deleteShipment('${s.id}')" title="Hapus" style="color:var(--danger)">🗑</button>` : ''}
         ${!canUpdate && !canInvoice && !canDelete ? '<span style="color:var(--text-light);font-size:.8rem">—</span>' : ''}
       </div>
     </td>
   </tr>`).join('');
+
+  // Mobile card list
+  renderMobileList(data, { canUpdate, canDelete, canInvoice });
 }
 
+/* ===== RENDER CARD LIST (Mobile) ===== */
+function renderMobileList(data, perms) {
+  const el = document.getElementById('mobileList');
+  if (!el) return;
+  const { canUpdate, canDelete, canInvoice } = perms;
+
+  el.innerHTML = data.map(s => `
+    <div class="ship-card">
+      <div class="ship-card-top">
+        <span class="ship-card-resi">${s.resi_number}</span>
+        <span class="badge badge-${s.status}">${s.status}</span>
+      </div>
+      <div class="ship-card-route">
+        <div class="ship-card-person">
+          <strong>${s.sender_name}</strong>
+          <span>${s.sender_phone||''}</span>
+        </div>
+        <span class="ship-card-route-arrow">→</span>
+        <div class="ship-card-person">
+          <strong>${s.receiver_name}</strong>
+          <span>${s.receiver_phone||''}</span>
+        </div>
+      </div>
+      <div class="ship-card-meta">
+        <span>📍 ${s.destination_detail?.city||'—'}</span>
+        <span>·</span>
+        <span>${s.service_detail?.name||'—'}</span>
+        <span>·</span>
+        <span>${s.weight} kg</span>
+        <span class="ship-card-cost">${fmt(s.total_cost)}</span>
+      </div>
+      ${(canUpdate || canInvoice || canDelete) ? `
+      <div class="ship-card-actions">
+        ${canUpdate  ? `<button class="btn btn-outline btn-sm" onclick="updateStatus('${s.id}','${s.resi_number}','${s.status}')">📋 Status</button>` : ''}
+        ${canInvoice ? `<button class="btn btn-outline btn-sm" onclick="goInvoice('${s.id}')">🧾 Invoice</button>` : ''}
+        ${canDelete  ? `<button class="btn btn-sm" style="background:var(--danger);color:#fff;flex:none" onclick="deleteShipment('${s.id}')">🗑</button>` : ''}
+      </div>` : ''}
+    </div>
+  `).join('');
+}
+
+/* ===== FILTER ===== */
 function filterTable() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
+  const q  = document.getElementById('searchInput').value.toLowerCase();
   const st = document.getElementById('filterStatus').value;
   renderTable(allShipments.filter(s => {
     const m = !q || s.resi_number.toLowerCase().includes(q) || s.sender_name.toLowerCase().includes(q) || s.receiver_name.toLowerCase().includes(q);
@@ -207,90 +550,127 @@ function filterTable() {
   }));
 }
 
+/* ===== CALC COST ===== */
 function calcCost() {
   const dId = document.getElementById('destinationId').value;
   const sId = document.getElementById('serviceId').value;
-  const w = parseFloat(document.getElementById('weight').value) || 0;
+  const w   = parseFloat(document.getElementById('weight').value) || 0;
   if (!dId || !sId || !w) { document.getElementById('costDisplay').style.display = 'none'; return; }
   const dest = destinations.find(d => d.id === dId);
-  const svc = services.find(s => s.id === sId);
+  const svc  = services.find(s => s.id === sId);
   if (!dest || !svc) return;
   const actualW = Math.max(w, svc.min_weight || 1);
-  const total = actualW * svc.price_per_kg + (dest.surcharge || 0) * actualW;
+  const total   = actualW * svc.price_per_kg + (dest.surcharge || 0) * actualW;
   document.getElementById('costDisplay').style.display = 'flex';
-  document.getElementById('costAmount').textContent = formatRp(total);
-  document.getElementById('costBreakdown').textContent = `${actualW}kg × ${formatRp(svc.price_per_kg)} + surcharge ${formatRp(dest.surcharge)}/kg`;
+  document.getElementById('costAmount').textContent    = fmt(total);
+  document.getElementById('costBreakdown').textContent = `${actualW}kg × ${fmt(svc.price_per_kg)} + surcharge ${fmt(dest.surcharge)}/kg`;
 }
 
+/* ===== SAVE SHIPMENT ===== */
 async function saveShipment() {
-  if (!can('shipment.create')) { showToast('Anda tidak memiliki izin untuk membuat pengiriman', 'error'); return; }
+  if (typeof can === "function" && !can('shipment.create')) {
+    if (typeof showToast === "function") showToast('Anda tidak memiliki izin membuat pengiriman', 'error'); return;
+  }
   const btn = document.getElementById('saveBtn');
-  btn.disabled = true; btn.textContent = 'Menyimpan...';
+  if (btn) { btn.disabled = true; btn.textContent = 'Menyimpan...'; }
   try {
     const data = {
-      sender_name: document.getElementById('senderName').value.trim(),
-      sender_address: document.getElementById('senderAddress').value.trim(),
-      sender_phone: document.getElementById('senderPhone').value.trim(),
-      receiver_name: document.getElementById('receiverName').value.trim(),
+      sender_name:      document.getElementById('senderName').value.trim(),
+      sender_address:   document.getElementById('senderAddress').value.trim(),
+      sender_phone:     document.getElementById('senderPhone').value.trim(),
+      receiver_name:    document.getElementById('receiverName').value.trim(),
       receiver_address: document.getElementById('receiverAddress').value.trim(),
-      receiver_phone: document.getElementById('receiverPhone').value.trim(),
-      destination_id: document.getElementById('destinationId').value,
-      service_id: document.getElementById('serviceId').value,
-      weight: parseFloat(document.getElementById('weight').value),
-      description: document.getElementById('description').value.trim(),
-      notes: document.getElementById('notes').value.trim(),
-      customer_id: document.getElementById('customerId').value || null,
+      receiver_phone:   document.getElementById('receiverPhone').value.trim(),
+      destination_id:   document.getElementById('destinationId').value,
+      service_id:       document.getElementById('serviceId').value,
+      weight:           parseFloat(document.getElementById('weight').value),
+      description:      document.getElementById('description').value.trim(),
+      notes:            document.getElementById('notes').value.trim(),
+      customer_id:      document.getElementById('customerId').value || null,
     };
     if (!data.sender_name || !data.receiver_name || !data.destination_id || !data.service_id || !data.weight) {
-      document.getElementById('formAlert').innerHTML = '<div class="alert alert-error">Lengkapi semua field wajib</div>'; return;
+      document.getElementById('formAlert').innerHTML = '<div class="alert alert-error">Lengkapi semua field wajib (bintang merah)</div>';
+      if (btn) { btn.disabled = false; btn.textContent = 'Simpan Pengiriman'; }
+      return;
     }
     await API.createShipment(data);
-    closeModal('modalShipment'); showToast('Pengiriman berhasil dibuat!');
-    ['senderName','senderAddress','senderPhone','receiverName','receiverAddress','receiverPhone','description','notes'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('destinationId').value = ''; document.getElementById('serviceId').value = ''; document.getElementById('weight').value = '';
-    document.getElementById('costDisplay').style.display = 'none'; document.getElementById('formAlert').innerHTML = '';
+    closeModal('modalShipment');
+    if (typeof showToast === "function") showToast('Pengiriman berhasil dibuat!');
+    ['senderName','senderAddress','senderPhone','receiverName','receiverAddress','receiverPhone','description','notes'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    ['destinationId','serviceId','weight'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.getElementById('costDisplay').style.display = 'none';
+    document.getElementById('formAlert').innerHTML = '';
     loadAll();
-  } catch(e) { document.getElementById('formAlert').innerHTML = `<div class="alert alert-error">${e.message}</div>`; }
-  finally { btn.disabled = false; btn.textContent = 'Simpan Pengiriman'; }
+  } catch(e) {
+    document.getElementById('formAlert').innerHTML = `<div class="alert alert-error">${e.message}</div>`;
+    // Scroll ke alert agar terlihat di mobile
+    document.getElementById('formAlert').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Simpan Pengiriman'; }
+  }
 }
 
+/* ===== UPDATE STATUS ===== */
 function updateStatus(id, resi, currentStatus) {
-  if (!can('shipment.update')) { showToast('Anda tidak memiliki izin untuk mengubah status', 'error'); return; }
+  if (typeof can === "function" && !can('shipment.update')) {
+    if (typeof showToast === "function") showToast('Anda tidak memiliki izin mengubah status', 'error'); return;
+  }
   document.getElementById('statusEditId').value = id;
-  document.getElementById('statusResi').value = resi;
-  document.getElementById('newStatus').value = currentStatus;
-  document.getElementById('statusNotes').value = '';
-  openModal('modalStatus');
+  document.getElementById('statusResi').value   = resi;
+  document.getElementById('newStatus').value    = currentStatus;
+  document.getElementById('statusNotes').value  = '';
+  if (typeof openModal === "function") openModal('modalStatus');
 }
 
 async function saveStatus() {
   const id = document.getElementById('statusEditId').value;
   try {
-    await API.updateShipment(id, { status: document.getElementById('newStatus').value, notes: document.getElementById('statusNotes').value });
-    closeModal('modalStatus'); showToast('Status berhasil diupdate!'); loadAll();
-  } catch(e) { showToast(e.message, 'error'); }
+    await API.updateShipment(id, {
+      status: document.getElementById('newStatus').value,
+      notes:  document.getElementById('statusNotes').value
+    });
+    if (typeof closeModal === "function") closeModal('modalStatus');
+    if (typeof showToast === "function") showToast('Status berhasil diupdate!');
+    loadAll();
+  } catch(e) {
+    if (typeof showToast === "function") showToast(e.message, 'error');
+  }
 }
 
+/* ===== NAVIGATE TO INVOICE ===== */
 function goInvoice(id) {
-  if (!can('invoice.create')) { showToast('Anda tidak memiliki izin ke modul invoice', 'error'); return; }
+  if (typeof can === "function" && !can('invoice.create')) {
+    if (typeof showToast === "function") showToast('Anda tidak memiliki izin ke modul invoice', 'error'); return;
+  }
   window.location.href = `invoices.html?shipment=${id}`;
 }
 
+/* ===== DELETE SHIPMENT ===== */
 async function deleteShipment(id) {
-  if (!can('shipment.delete')) { showToast('Anda tidak memiliki izin untuk menghapus pengiriman', 'error'); return; }
-  if (!confirmAction('Yakin hapus pengiriman ini?')) return;
-  try { await API.deleteShipment(id); showToast('Pengiriman dihapus'); loadAll(); }
-  catch(e) { showToast(e.message, 'error'); }
+  if (typeof can === "function" && !can('shipment.delete')) {
+    if (typeof showToast === "function") showToast('Anda tidak memiliki izin menghapus pengiriman', 'error'); return;
+  }
+  if (typeof confirmAction === "function" && !confirmAction('Yakin hapus pengiriman ini?')) return;
+  try {
+    await API.deleteShipment(id);
+    if (typeof showToast === "function") showToast('Pengiriman dihapus');
+    loadAll();
+  } catch(e) {
+    if (typeof showToast === "function") showToast(e.message, 'error');
+  }
 }
 
-AOS.init({
+/* ===== AOS ===== */
+if (typeof AOS !== "undefined") {
+  AOS.init({
     duration: 700,
     easing: 'ease-in-out',
-    once: true
+    once: true,
+    disable: window.innerWidth < 768
   });
-
-  showRoleBanner();
-loadAll();
+}
 </script>
 </body>
 </html>

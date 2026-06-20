@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — PT Galaxy MultiTrans</title>
 <link rel="stylesheet" href="../css/style.css">
+<link rel="icon" type="image/png" href="../image/logo1.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Diplomata&family=Lobster&family=Oswald:wght@500&family=Pliant:ital,wght@0,100..900;1,100..900&family=Six+Caps&display=swap" rel="stylesheet">
@@ -14,10 +15,12 @@
 </head>
 <body>
 <div class="app-layout">
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon"><img src="../image/logo1.png" alt="Logo Galaxy MultiTrans"></div>
       <div class="logo-text"><strong>Galaxy MultiTrans</strong><span>Ekspedisi & Logistik</span></div>
+      <button class="sidebar-close" onclick="closeSidebar()">✕</button>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -51,8 +54,10 @@
     </div>
   </aside>
 
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
   <div class="main-content">
     <div class="topbar">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
       <div class="topbar-title">
         <h2>Dashboard</h2>
         <p>Selamat datang, <span id="welcomeName">Admin</span></p>
@@ -135,6 +140,18 @@ if (user) {
     });
   }
 }
+
+function openSidebar() {
+  document.querySelector('.sidebar').classList.add('open');
+  document.querySelector('.sidebar-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.querySelector('.sidebar-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.querySelector('.menu-toggle').addEventListener('click', openSidebar);
 
 async function loadDashboard() {
   try {
