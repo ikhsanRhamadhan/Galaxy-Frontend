@@ -1,0 +1,62 @@
+<!-- Sidebar navigation shared component (include via JS) -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">✦</div>
+    <div class="logo-text">
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Diplomata&family=Lobster&family=Oswald:wght@500&family=Pliant:ital,wght@0,100..900;1,100..900&family=Six+Caps&display=swap" rel="stylesheet">
+      <strong>Galaxy MultiTrans</strong>
+      <span>Ekspedisi & Logistik</span>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Utama</div>
+      <a href="dashboard.html" class="nav-item" data-page="dashboard">
+        <span class="nav-icon">◈</span> Dashboard
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Transaksi</div>
+      <a href="shipments.html" class="nav-item" data-page="shipments">
+        <span class="nav-icon">📦</span> Pengiriman
+      </a>
+      <a href="invoices.html" class="nav-item" data-page="invoices">
+        <span class="nav-icon">🧾</span> Invoice
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Data Master</div>
+      <a href="customers.html" class="nav-item" data-page="customers">
+        <span class="nav-icon">👥</span> Pelanggan
+      </a>
+      <a href="destinations.html" class="nav-item" data-page="destinations">
+        <span class="nav-icon">📍</span> Tujuan
+      </a>
+      <a href="services.html" class="nav-item" data-page="services">
+        <span class="nav-icon">⚙️</span> Layanan & Tarif
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Laporan</div>
+      <a href="reports.html" class="nav-item" data-page="reports">
+        <span class="nav-icon">📊</span> Laporan
+      </a>
+    </div>
+    <div class="nav-section admin-only">
+      <div class="nav-section-label">Administrasi</div>
+      <a href="users.html" class="nav-item admin-only" data-page="users">
+        <span class="nav-icon">🔑</span> Manajemen User
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sidebarUserAvatar">A</div>
+    <div class="user-info">
+      <strong id="sidebarUserName">User</strong>
+      <span id="sidebarUserRole">role</span>
+    </div>
+    <button class="btn-logout" onclick="API.logout()" title="Keluar">⏻</button>
+  </div>
+</aside>

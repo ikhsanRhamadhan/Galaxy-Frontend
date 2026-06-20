@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — PT Galaxy Multi Trans</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+</head>
+<body class="login-body">
+<div class="login-wrapper">
+  <div class="login-left">
+    <div class="login-brand">
+      <h1>Galaxy<br><span>MultiTrans</span></h1>
+      <p>Sistem Manajemen Pengiriman & Invoice Otomatis</p>
+    </div>
+    <div class="login-decoration">
+      <div class="deco-circle c1"></div>
+      <div class="deco-circle c2"></div>
+      <div class="deco-circle c3"></div>
+      <div class="deco-grid"></div>
+    </div>
+  </div>
+  <div class="login-right">
+    <div class="login-box">
+      <div class="login-header">
+        <h2>Selamat Datang</h2>
+        <p>Masuk ke sistem manajemen Anda</p>
+      </div>
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label>Username</label>
+          <div class="input-wrap">
+            <span class="input-icon">⊙</span>
+            <input type="text" id="username" placeholder="Masukkan username" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">◈</span>
+            <input type="password" id="password" placeholder="Masukkan password" required>
+            <button type="button" class="toggle-pw" onclick="togglePw()">👁</button>
+          </div>
+        </div>
+        <div id="loginError" class="alert alert-error" style="display:none"></div>
+        <button type="submit" class="btn-login" id="loginBtn">
+          <span>Masuk</span>
+          <span class="btn-arrow">→</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="js/api.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('loginError');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  err.style.display = 'none';
+  
+  try {
+    const res = await API.login(
+      document.getElementById('username').value,
+      document.getElementById('password').value
+    );
+    localStorage.setItem('token', res.token);
+    localStorage.setItem('user', JSON.stringify(res.user));
+    window.location.href = 'pages/dashboard.html';
+  } catch(e) {
+    err.textContent = e.message || 'Login gagal';
+    err.style.display = 'block';
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+});
+
+function togglePw() {
+  const pw = document.getElementById('password');
+  pw.type = pw.type === 'password' ? 'text' : 'password';
+}
+</script>
+</body>
+</html>

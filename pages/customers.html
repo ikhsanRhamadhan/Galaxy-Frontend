@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pelanggan — PT Galaxy MultiTrans</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Diplomata&family=Lobster&family=Oswald:wght@500&family=Pliant:ital,wght@0,100..900;1,100..900&family=Six+Caps&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="logo-icon"><img src="../image/logo1.png" alt="Logo Galaxy MultiTrans"></div><div class="logo-text"><strong>Galaxy MultiTrans</strong><span>Ekspedisi & Logistik</span></div></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section"><div class="nav-section-label">Utama</div><a href="dashboard.html" class="nav-item"><span class="nav-icon">◈</span> Dashboard</a></div>
+      <div class="nav-section"><div class="nav-section-label">Transaksi</div>
+        <a href="shipments.html" class="nav-item"><span class="nav-icon">📦</span> Pengiriman</a>
+        <a href="invoices.html" class="nav-item"><span class="nav-icon">🧾</span> Invoice</a>
+      </div>
+      <div class="nav-section"><div class="nav-section-label">Data Master</div>
+        <a href="customers.html" class="nav-item active"><span class="nav-icon">👥</span> Pelanggan</a>
+        <a href="destinations.html" class="nav-item"><span class="nav-icon">📍</span> Tujuan</a>
+        <a href="services.html" class="nav-item"><span class="nav-icon">⚙️</span> Layanan & Tarif</a>
+      </div>
+      <div class="nav-section"><div class="nav-section-label">Laporan</div><a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Laporan</a></div>
+      <div class="nav-section admin-only"><div class="nav-section-label">Administrasi</div><a href="users.html" class="nav-item admin-only"><span class="nav-icon">🔑</span> Manajemen User</a></div>
+    </nav>
+    <div class="sidebar-user"><div class="user-avatar" id="sidebarUserAvatar">A</div><div class="user-info"><strong id="sidebarUserName">User</strong><span id="sidebarUserRole">role</span></div><button class="btn-logout" onclick="API.logout()">⏻</button></div>
+  </aside>
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-title"><h2>Data Pelanggan</h2><p>Kelola data pelanggan perusahaan</p></div>
+      <div class="topbar-actions"><button class="btn btn-primary" onclick="openAdd()" data-perm-master-write>+ Pelanggan Baru</button></div>
+    </div>
+     <div data-aos="fade-down"
+        data-aos-anchor-placement="center-center">
+    <div class="page-content">
+      <div class="card">
+        <div class="card-header">
+          <h3>Daftar Pelanggan</h3>
+          <div class="search-wrap"><span class="search-icon">🔍</span><input type="text" id="searchInput" placeholder="Cari nama, kontak..." oninput="filterTable()"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nama</th><th>Alamat</th><th>Telepon</th><th>Email</th><th>PIC</th><th>NPWP</th><th>Aksi</th></tr></thead>
+            <tbody id="tableBody"><tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-secondary)">Memuat data...</td></tr></tbody>
+          </table>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalForm">
+  <div class="modal modal-md">
+    <div class="modal-header"><h3 id="modalTitle">Tambah Pelanggan</h3><button class="modal-close" onclick="closeModal('modalForm')">✕</button></div>
+    <div class="modal-body">
+      <div id="formAlert"></div>
+      <input type="hidden" id="editId">
+      <div class="form-grid">
+        <div class="form-group full"><label class="form-label">Nama Perusahaan / Pelanggan <span>*</span></label><input class="form-control" id="fName" placeholder="PT / CV / Nama Pelanggan"></div>
+        <div class="form-group full"><label class="form-label">Alamat <span>*</span></label><textarea class="form-control" id="fAddress" rows="2" placeholder="Alamat lengkap"></textarea></div>
+        <div class="form-group"><label class="form-label">Telepon <span>*</span></label><input class="form-control" id="fPhone" placeholder="021-xxxxxxx"></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-control" id="fEmail" type="email" placeholder="email@perusahaan.com"></div>
+        <div class="form-group"><label class="form-label">Contact Person</label><input class="form-control" id="fContact" placeholder="Nama PIC"></div>
+        <div class="form-group"><label class="form-label">NPWP</label><input class="form-control" id="fNpwp" placeholder="XX.XXX.XXX.X-XXX.XXX"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalForm')">Batal</button>
+      <button class="btn btn-primary" onclick="saveData()" id="saveBtn">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script>
+requireAuth(); initUserInfo();
+let allData = [];
+
+async function loadAll() {
+  try { allData = await API.getCustomers(); renderTable(allData); }
+  catch(e) { showToast(e.message, 'error'); }
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-secondary" style="padding:2rem">Tidak ada data pelanggan</td></tr>'; return; }
+  // Tampilkan banner untuk non-admin
+const _cUser = API.getUser();
+if (_cUser && _cUser.role !== 'admin') {
+  const b = document.createElement('div');
+  b.className = 'alert alert-info mb-4';
+  b.innerHTML = '🔒 <strong>Data Master:</strong> Anda hanya dapat melihat data pelanggan. Untuk menambah/mengubah data, hubungi Admin.';
+  document.querySelector('.page-content').prepend(b);
+}
+
+  tbody.innerHTML = data.map(c => `<tr>
+    <td><strong>${c.name}</strong></td>
+    <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.address}</td>
+    <td>${c.phone}</td>
+    <td>${c.email || '—'}</td>
+    <td>${c.contact_person || '—'}</td>
+    <td style="font-size:.8rem">${c.npwp || '—'}</td>
+    <td><div class="td-actions" data-perm-master-write>
+      <button class="btn btn-icon btn-sm" onclick="editData('${c.id}')">✏️</button>
+      <button class="btn btn-icon btn-sm" onclick="deleteData('${c.id}')" style="color:var(--danger)">🗑</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function filterTable() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  renderTable(allData.filter(c => c.name.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q)));
+}
+
+function openAdd() {
+  document.getElementById('editId').value = '';
+  document.getElementById('modalTitle').textContent = 'Tambah Pelanggan';
+  ['fName','fAddress','fPhone','fEmail','fContact','fNpwp'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('formAlert').innerHTML = '';
+  openModal('modalForm');
+}
+
+function editData(id) {
+  const c = allData.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('editId').value = id;
+  document.getElementById('modalTitle').textContent = 'Edit Pelanggan';
+  document.getElementById('fName').value = c.name;
+  document.getElementById('fAddress').value = c.address;
+  document.getElementById('fPhone').value = c.phone;
+  document.getElementById('fEmail').value = c.email || '';
+  document.getElementById('fContact').value = c.contact_person || '';
+  document.getElementById('fNpwp').value = c.npwp || '';
+  document.getElementById('formAlert').innerHTML = '';
+  openModal('modalForm');
+}
+
+async function saveData() {
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  try {
+    const data = { name: document.getElementById('fName').value.trim(), address: document.getElementById('fAddress').value.trim(), phone: document.getElementById('fPhone').value.trim(), email: document.getElementById('fEmail').value.trim(), contact_person: document.getElementById('fContact').value.trim(), npwp: document.getElementById('fNpwp').value.trim() };
+    if (!data.name || !data.address || !data.phone) { document.getElementById('formAlert').innerHTML = '<div class="alert alert-error">Lengkapi field wajib</div>'; return; }
+    const id = document.getElementById('editId').value;
+    if (id) await API.updateCustomer(id, data); else await API.createCustomer(data);
+    closeModal('modalForm'); showToast('Data berhasil disimpan!'); loadAll();
+  } catch(e) { document.getElementById('formAlert').innerHTML = `<div class="alert alert-error">${e.message}</div>`; }
+  finally { btn.disabled = false; }
+}
+
+async function deleteData(id) {
+  if (!confirmAction('Yakin hapus pelanggan ini?')) return;
+  try { await API.deleteCustomer(id); showToast('Pelanggan dihapus'); loadAll(); }
+  catch(e) { showToast(e.message, 'error'); }
+}
+
+AOS.init();
+loadAll();
+</script>
+</body>
+</html>

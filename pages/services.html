@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Layanan & Tarif — PT Galaxy MultiTrans</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Diplomata&family=Lobster&family=Oswald:wght@500&family=Pliant:ital,wght@0,100..900;1,100..900&family=Six+Caps&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="logo-icon"><img src="../image/logo1.png" alt="Logo Galaxy MultiTrans"></div><div class="logo-text"><strong>Galaxy MultiTrans</strong><span>Ekspedisi & Logistik</span></div></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section"><div class="nav-section-label">Utama</div><a href="dashboard.html" class="nav-item"><span class="nav-icon">◈</span> Dashboard</a></div>
+      <div class="nav-section"><div class="nav-section-label">Transaksi</div><a href="shipments.html" class="nav-item"><span class="nav-icon">📦</span> Pengiriman</a><a href="invoices.html" class="nav-item"><span class="nav-icon">🧾</span> Invoice</a></div>
+      <div class="nav-section"><div class="nav-section-label">Data Master</div>
+        <a href="customers.html" class="nav-item"><span class="nav-icon">👥</span> Pelanggan</a>
+        <a href="destinations.html" class="nav-item"><span class="nav-icon">📍</span> Tujuan</a>
+        <a href="services.html" class="nav-item active"><span class="nav-icon">⚙️</span> Layanan & Tarif</a>
+      </div>
+      <div class="nav-section"><div class="nav-section-label">Laporan</div><a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Laporan</a></div>
+      <div class="nav-section admin-only"><div class="nav-section-label">Administrasi</div><a href="users.html" class="nav-item admin-only"><span class="nav-icon">🔑</span> Manajemen User</a></div>
+    </nav>
+    <div class="sidebar-user"><div class="user-avatar" id="sidebarUserAvatar">A</div><div class="user-info"><strong id="sidebarUserName">User</strong><span id="sidebarUserRole">role</span></div><button class="btn-logout" onclick="API.logout()">⏻</button></div>
+  </aside>
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-title"><h2>Layanan & Tarif</h2><p>Konfigurasi jenis layanan dan harga per kg</p></div>
+      <div class="topbar-actions"><button class="btn btn-primary" onclick="openAdd()" data-perm-master-write>+ Layanan Baru</button></div>
+    </div>
+    <div data-aos="fade-down"
+        data-aos-duration="3001">
+    <div class="page-content">
+      <div id="serviceCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin-bottom:1.5rem"></div>
+      <d class="card">
+        <div class="card-header"><h3>Semua Layanan</h3></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Kode</th><th>Nama Layanan</th><th>Deskripsi</th><th>Harga/kg</th><th>Min. Berat</th><th>Aksi</th></tr></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalForm">
+  <div class="modal modal-sm">
+    <div class="modal-header"><h3 id="modalTitle">Tambah Layanan</h3><button class="modal-close" onclick="closeModal('modalForm')">✕</button></div>
+    <div class="modal-body">
+      <div id="formAlert"></div>
+      <input type="hidden" id="editId">
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Kode <span>*</span></label><input class="form-control" id="fCode" placeholder="REG" style="text-transform:uppercase"></div>
+        <div class="form-group"><label class="form-label">Nama Layanan <span>*</span></label><input class="form-control" id="fName" placeholder="Reguler"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Deskripsi</label><input class="form-control" id="fDesc" placeholder="Keterangan layanan"></div>
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Harga per kg (Rp) <span>*</span></label><input class="form-control" id="fPrice" type="number" min="0" placeholder="15000"></div>
+        <div class="form-group"><label class="form-label">Min. Berat (kg)</label><input class="form-control" id="fMinW" type="number" min="0" step="0.1" value="1" placeholder="1"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalForm')">Batal</button>
+      <button class="btn btn-primary" onclick="saveData()" id="saveBtn">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script>
+requireAuth(); initUserInfo();
+let allData = [];
+const svcIcons = { REG: '📦', EXP: '⚡', CGO: '🚚' };
+const svcColors = { REG: '#3182CE', EXP: '#E53E3E', CGO: '#DD6B20' };
+
+async function loadAll() {
+  try { allData = await API.getServices(); renderCards(); renderTable(allData); }
+  catch(e) { showToast(e.message, 'error'); }
+}
+
+function renderCards() {
+  document.getElementById('serviceCards').innerHTML = allData.map(s => `
+    <div class="card" style="border-top:4px solid ${svcColors[s.code]||'var(--primary)'}">
+      <div class="card-body">
+        <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+          <div style="width:44px;height:44px;background:${svcColors[s.code]||'var(--primary)'}22;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1.4rem">${svcIcons[s.code]||'📦'}</div>
+          <div><strong style="font-family:var(--font-display);font-size:1rem">${s.name}</strong><br><span style="font-size:.78rem;color:var(--text-secondary)">[${s.code}] ${s.description||''}</span></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-size:.78rem;color:var(--text-secondary)">Tarif per kg</div><div style="font-size:1.2rem;font-weight:700;color:${svcColors[s.code]||'var(--primary)'}">${formatRp(s.price_per_kg)}</div></div>
+          <div style="text-align:right"><div style="font-size:.78rem;color:var(--text-secondary)">Min. Berat</div><div style="font-weight:600">${s.min_weight} kg</div></div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-secondary" style="padding:2rem">Tidak ada layanan</td></tr>'; return; }
+  tbody.innerHTML = data.map(s => `<tr>
+    <td><span class="tag">${s.code}</span></td>
+    <td><strong>${s.name}</strong></td>
+    <td style="color:var(--text-secondary)">${s.description||'—'}</td>
+    <td style="font-weight:600;color:var(--primary)">${formatRp(s.price_per_kg)}</td>
+    <td>${s.min_weight} kg</td>
+    <td><div class="td-actions admin-only">
+      <button class="btn btn-icon btn-sm admin-only" onclick="editData('${s.id}')">✏️</button>
+      <button class="btn btn-icon btn-sm admin-only" onclick="deleteData('${s.id}')" style="color:var(--danger)">🗑</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function openAdd() {
+  document.getElementById('editId').value = '';
+  document.getElementById('modalTitle').textContent = 'Tambah Layanan';
+  ['fCode','fName','fDesc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fPrice').value = '';
+  document.getElementById('fMinW').value = '1';
+  document.getElementById('formAlert').innerHTML = '';
+  openModal('modalForm');
+}
+
+function editData(id) {
+  const s = allData.find(x => x.id === id); if (!s) return;
+  document.getElementById('editId').value = id;
+  document.getElementById('modalTitle').textContent = 'Edit Layanan';
+  document.getElementById('fCode').value = s.code;
+  document.getElementById('fName').value = s.name;
+  document.getElementById('fDesc').value = s.description || '';
+  document.getElementById('fPrice').value = s.price_per_kg;
+  document.getElementById('fMinW').value = s.min_weight;
+  document.getElementById('formAlert').innerHTML = '';
+  openModal('modalForm');
+}
+
+async function saveData() {
+  const btn = document.getElementById('saveBtn'); btn.disabled = true;
+  try {
+    const data = { code: document.getElementById('fCode').value.trim().toUpperCase(), name: document.getElementById('fName').value.trim(), description: document.getElementById('fDesc').value.trim(), price_per_kg: parseFloat(document.getElementById('fPrice').value), min_weight: parseFloat(document.getElementById('fMinW').value) || 1 };
+    if (!data.code || !data.name || !data.price_per_kg) { document.getElementById('formAlert').innerHTML = '<div class="alert alert-error">Lengkapi field wajib</div>'; return; }
+    const id = document.getElementById('editId').value;
+    if (id) await API.updateService(id, data); else await API.createService(data);
+    closeModal('modalForm'); showToast('Layanan berhasil disimpan!'); loadAll();
+  } catch(e) { document.getElementById('formAlert').innerHTML = `<div class="alert alert-error">${e.message}</div>`; }
+  finally { btn.disabled = false; }
+}
+
+async function deleteData(id) {
+  if (!confirmAction('Yakin hapus layanan ini?')) return;
+  try { await API.deleteService(id); showToast('Layanan dihapus'); loadAll(); }
+  catch(e) { showToast(e.message, 'error'); }
+}
+
+
+AOS.init();
+loadAll();
+</script>
+</body>
+</html>
