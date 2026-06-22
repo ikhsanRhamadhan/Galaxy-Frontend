@@ -1,5 +1,6 @@
-const API_BASE = 'http://localhost:8000/api';
+// const API_BASE = 'http://localhost:8000/api';
 // const API_BASE = 'https://6rz9bsm8-8000.asse.devtunnels.ms/api';
+const API_BASE = 'galaxy-backend-production-e2b4.up.railway.app/api';
 
 const API = {
   getToken() { return localStorage.getItem('token'); },
@@ -10,7 +11,7 @@ const API = {
     const headers = { 'Content-Type': 'application/json' };
     const token = this.getToken();
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const opts = { method, headers };
+    const opts = { method, headers }; 
     if (body) opts.body = JSON.stringify(body);
     const res = await fetch(API_BASE + path, opts);
     if (res.status === 401) { this.logout(); throw new Error('Sesi habis, silakan login kembali'); }
