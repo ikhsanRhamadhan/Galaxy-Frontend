@@ -21,143 +21,163 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
     <style>
-      /* ===== INVOICE PAGE — MOBILE STYLES ===== */
+     /* ===== INVOICE PAGE — MOBILE STYLES ===== */
+    #invoicePrintArea {
+      max-width: 790px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      background: #ffffff;
+      box-sizing: border-box;
+    }
 
-      #invoicePrintArea {
-        max-width: 790px;
-        margin: 0 auto;
-        padding: 2.5rem 2rem;
-        background: #ffffff;
-        box-sizing: border-box;
-      }
-      .kwitansi-section,
-      .kwitansi-page {
-        margin-top: 5rem;
-        padding-top: 2rem;
-      }
+    .kwitansi-section,
+    .kwitansi-page {
+      margin-top: 5rem;
+      padding-top: 2rem;
+    }
 
-      /* Tombol aksi di header preview modal */
-      .preview-actions {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-      }
+    .preview-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
 
-      /* Card list mobile untuk invoice */
+    .mobile-list {
+      margin-top: 0.25rem;
+    }
+
+    .inv-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .inv-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .inv-card-num {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--primary);
+    }
+
+    .inv-card-rows {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem 0.75rem;
+      font-size: 0.82rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .inv-card-rows dt {
+      color: var(--text-secondary);
+    }
+
+    .inv-card-rows dd {
+      font-weight: 500;
+    }
+
+    .inv-card-total {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 0.6rem;
+      border-top: 1px solid var(--border);
+      gap: 0.5rem;
+    }
+
+    .inv-card-total-amount {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--primary);
+    }
+
+    .inv-card-actions {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    /* ===== MOBILE RESPONSIVE (MAX-WIDTH 640PX) ===== */
+    @media (max-width: 640px) {
+      /* Tabel disembunyikan, card list tampil */
+      .table-wrap table {
+        display: none;
+      }
       .mobile-list {
-        margin-top: 0.25rem;
-      }
-      .inv-card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 1rem;
-        margin-bottom: 0.75rem;
-      }
-      .inv-card-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.5rem;
-        margin-bottom: 0.6rem;
-      }
-      .inv-card-num {
-        font-family: var(--font-display);
-        font-weight: 700;
-        font-size: 0.9rem;
-        color: var(--primary);
-      }
-      .inv-card-rows {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.4rem 0.75rem;
-        font-size: 0.82rem;
-        margin-bottom: 0.75rem;
-      }
-      .inv-card-rows dt {
-        color: var(--text-secondary);
-      }
-      .inv-card-rows dd {
-        font-weight: 500;
-      }
-      .inv-card-total {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-top: 0.6rem;
-        border-top: 1px solid var(--border);
-        gap: 0.5rem;
-      }
-      .inv-card-total-amount {
-        font-family: var(--font-display);
-        font-weight: 800;
-        font-size: 1rem;
-        color: var(--primary);
-      }
-      .inv-card-actions {
-        display: flex;
-        gap: 0.4rem;
+        display: block;
       }
 
-      @media (max-width: 640px) {
-        /* Tabel disembunyikan, card list tampil */
-        .table-wrap table {
-          display: none;
-        }
-        .mobile-list {
-          display: block;
-        }
-
-        /* Topbar: teks tombol disingkat */
-        .btn-invoice-text {
-          display: none;
-        }
-        .btn-invoice-icon {
-          display: inline;
-        }
-
-        /* Modal dari bawah */
-        .modal-overlay {
-          padding: 0;
-          align-items: flex-end;
-        }
-        .modal {
-          border-radius: 16px 16px 0 0 !important;
-          max-height: 92vh;
-        }
-        /* Modal preview tetap full height */
-        #modalPreview .modal {
-          max-height: 96vh;
-        }
-
-        /* Form 2-col di modal create jadi 1-col */
-        .inv-form-twocol {
-          grid-template-columns: 1fr !important;
-        }
-
-        /* Tombol cetak/pdf di header modal preview */
-        .preview-actions .btn span {
-          display: none;
-        }
-        .preview-actions .btn::before {
-          content: attr(data-icon);
-        }
-
-        /* Print area lebih kecil di mobile preview */
-        #invoicePrintArea {
-          padding: 1rem 0.75rem;
-        }
+      /* Topbar: teks tombol disingkat */
+      .btn-invoice-text {
+        display: none;
+      }
+      .btn-invoice-icon {
+        display: inline;
       }
 
-      @media (min-width: 641px) {
-        .btn-invoice-icon {
-          display: none;
-        }
-        .mobile-list {
-          display: none;
-        }
+      /* --- FIX MODAL MOBILE --- */
+      .modal-overlay {
+        padding: 0;
+        align-items: flex-end;
       }
-    </style>
+      
+      .modal {
+        border-radius: 16px 16px 0 0 !important;
+        max-height: 90vh !important; /* Dibatasi agar tidak tertutup keyboard/nav */
+        display: flex !important;    /* Paksa flexbox */
+        flex-direction: column !important;
+        margin: 0 !important;
+        width: 100% !important;
+      }
+
+      .modal-body {
+        flex: 1 !important;          /* Ambil sisa ruang */
+        overflow-y: auto !important; /* Buat konten scrollable di dalam */
+        padding: 1rem !important;
+      }
+
+      /* Modal preview tetap full height */
+      #modalPreview .modal {
+        max-height: 90vh !important;
+      }
+
+      /* Form 2-col di modal create jadi 1-col */
+      .inv-form-twocol {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* Tombol cetak/pdf di header modal preview */
+      .preview-actions .btn span {
+        display: none;
+      }
+      .preview-actions .btn::before {
+        content: attr(data-icon);
+      }
+
+      /* Print area lebih kecil di mobile preview */
+      #invoicePrintArea {
+        padding: 1rem 0.75rem !important;
+      }
+    }
+
+    @media (min-width: 641px) {
+      .btn-invoice-icon {
+        display: none;
+      }
+      .mobile-list {
+        display: none;
+      }
+    }
+  </style>
   </head>
   <body>
     <div class="app-layout">
