@@ -1,7 +1,7 @@
 // const API_BASE = 'http://localhost:8000/api';  
 // const API_BASE = 'https://6rz9bsm8-8000.asse.devtunnels.ms/api';
 // const API_BASE = '  https://democracy-affirm-glazing.ngrok-free.dev/api';
-const API_BASE = 'https://galaxy-backend-production-0bd3.up.railway.app/api';
+const API_BASE = 'https://galaxy-backend-production-0bd3.up.railway.app';
 
 const API = {
   getToken() { return localStorage.getItem('token'); },
