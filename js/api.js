@@ -6,7 +6,36 @@ const API_BASE = 'https://galaxy-backend-production-0bd3.up.railway.app/api';
 const API = {
   getToken() { return localStorage.getItem('token'); },
   getUser() { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } },
-  logout() { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = '/index.html'; },
+  logout(silent = false) {
+    if (silent) { this._doLogout(); return; }
+    this._showLogoutConfirm();
+  },
+  _doLogout() { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = '/index.html'; },
+  _showLogoutConfirm() {
+    let overlay = document.getElementById('confirmLogoutModal');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'confirmLogoutModal';
+      overlay.className = 'modal-overlay';
+      overlay.innerHTML = `
+        <div class="modal modal-sm">
+          <div class="modal-header">
+            <h3>Konfirmasi Keluar</h3>
+            <button class="modal-close" onclick="closeModal('confirmLogoutModal')">✕</button>
+          </div>
+          <div class="modal-body">
+            <p style="margin:0;font-size:.95rem">Yakin ingin keluar dari sistem?</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('confirmLogoutModal')">Batal</button>
+            <button class="btn btn-danger" onclick="API._doLogout()">Ya, Keluar</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+    }
+    openModal('confirmLogoutModal');
+  },
 
   async request(method, path, body = null) {
     const headers = { 'Content-Type': 'application/json' };
@@ -15,7 +44,7 @@ const API = {
     const opts = { method, headers }; 
     if (body) opts.body = JSON.stringify(body);
     const res = await fetch(API_BASE + path, opts);
-    if (res.status === 401) { this.logout(); throw new Error('Sesi habis, silakan login kembali'); }
+    if (res.status === 401) { this.logout(true); throw new Error('Sesi habis, silakan login kembali'); }
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || 'Terjadi kesalahan');
     return data;
