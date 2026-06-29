@@ -1093,7 +1093,10 @@
           ]);
           const urlParams = new URLSearchParams(window.location.search);
           const shipParam = urlParams.get("shipment");
-          if (shipParam) openCreateModal(shipParam);
+          if (shipParam) {
+            openCreateModal(shipParam);
+            history.replaceState(null, '', window.location.pathname);
+          }
           renderTable(allInvoices);
         } catch (e) {
           console.error("Gagal memuat data API:", e);
